@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.epinfoManager.ImportEpinfoDao">
+	<select id="queryAllImei" resultType="java.lang.String">
+		select t.imei from t_rt_ep_info t where t.is_del = 0 GROUP BY t.imei
+	</select>
+	<select id="queryArea" parameterType="map" resultType="java.lang.String">
+		SELECT
+			t.region_code
+		FROM
+			t_cms_region_dic t
+		WHERE
+			1=1
+			AND t.level1_name = #{province}
+			<if test="district !=null and district != '' and district != '全部'">
+			AND t.level2_name = #{district}
+			</if>
+			<if test="district !=null and district != '' and district == '全部'">
+			AND t.level2_name is null
+			</if>
+			<if test="area !=null and area != '' and area != '全部'">
+			AND t.level3_name = #{area}
+			</if>
+			<if test="area !=null and area != '' and area == '全部'">
+			AND t.level3_name is null
+			</if>
+		limit 0,1
+	</select>
+	<insert id="insertByBatch" parameterType="map">
+		INSERT INTO `t_rt_ep_info` (
+			`imei`, `term_model`, `telecoms`,
+		  `province`, `district`, `area`, `region_code`,
+		  `is_del`, `memo`, `update_time`, `create_time`)
+		 VALUES (#{imei},#{term_model},#{telecoms},
+		 #{province},#{district},#{area},#{region_code},
+		 #{is_del},#{memo},#{update_time},#{create_time})
+	</insert>
+</mapper>

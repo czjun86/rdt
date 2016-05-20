@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ECharts">
+    <meta name="author" content="kener.linfeng@gmail.com">
+    <title>ECharts · Example</title>
+
+    <link href="./www/css/echartsHome.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="./www/js/echarts.js"></script>
+</head>
+
+<body>
+<div id="main" class="main"></div>
+<span id='wrong-message' style="color:red"></span>
+<span id='hover-console' style="color:#1e90ff"></span>
+<span id='console' style="color:#1e90ff">Event Console</span>
+<script type="text/javascript">
+    option = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['最高', '最低']
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
+        calculable: true,
+        dataZoom: {
+            show: true,
+            realtime: true,
+            start: 40,
+            end: 60
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: true,
+                data: function () {
+                    var list = [];
+                    for (var i = 1; i <= 30; i++) {
+                        list.push('2013-03-' + i);
+                    }
+                    return list;
+                }()
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '最高',
+                type: 'line',
+                data: function () {
+                    var list = [];
+                    for (var i = 1; i <= 30; i++) {
+                        list.push(Math.round(Math.random() * 30) + 30);
+                    }
+                    return list;
+                }()
+            },
+            {
+                name: '最低',
+                type: 'bar',
+                data: function () {
+                    var list = [];
+                    for (var i = 1; i <= 30; i++) {
+                        list.push(Math.round(Math.random() * 10));
+                    }
+                    return list;
+                }()
+            }
+        ]
+    };
+
+    require.config({
+        paths: {
+            echarts: './www/js'
+        }
+    });
+    // Step:4 require echarts and use it in the callback.
+    // Step:4 动态加载echarts然后在回调函数中开始使用，注意保持按需加载结构定义图表路径
+    require(
+            [
+                'echarts',
+                'echarts/chart/bar',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                //--- 折柱 ---
+                var myChart = ec.init(document.getElementById('main'));
+                myChart.setOption(option);
+                window.onresize = myChart.resize;
+
+                var ecConfig = require('echarts/config');
+                /*
+                 // -------全局通用
+                 REFRESH: 'refresh',
+                 RESTORE: 'restore',
+                 RESIZE: 'resize',
+                 CLICK: 'click',
+                 DBLCLICK: 'dblclick',
+                 HOVER: 'hover',
+                 MOUSEOUT: 'mouseout',
+                 // -------业务交互逻辑
+                 DATA_CHANGED: 'dataChanged',
+                 DATA_ZOOM: 'dataZoom',
+                 DATA_RANGE: 'dataRange',
+                 DATA_RANGE_HOVERLINK: 'dataRangeHoverLink',
+                 LEGEND_SELECTED: 'legendSelected',
+                 LEGEND_HOVERLINK: 'legendHoverLink',
+                 MAP_SELECTED: 'mapSelected',
+                 PIE_SELECTED: 'pieSelected',
+                 MAGIC_TYPE_CHANGED: 'magicTypeChanged',
+                 DATA_VIEW_CHANGED: 'dataViewChanged',
+                 TIMELINE_CHANGED: 'timelineChanged',
+                 MAP_ROAM: 'mapRoam',
+                 */
+                myChart.on(ecConfig.EVENT.CLICK, eConsole);
+                myChart.on(ecConfig.EVENT.DBLCLICK, eConsole);
+                myChart.on(ecConfig.EVENT.HOVER, eConsole);
+                myChart.on(ecConfig.EVENT.DATA_ZOOM, eConsole);
+                myChart.on(ecConfig.EVENT.LEGEND_SELECTED, eConsole);
+                myChart.on(ecConfig.EVENT.MAGIC_TYPE_CHANGED, eConsole);
+                myChart.on(ecConfig.EVENT.DATA_VIEW_CHANGED, eConsole);
+            }
+    );
+
+    function eConsole(param) {
+        var mes = '【' + param.type + '】';
+        if (typeof param.seriesIndex != 'undefined') {
+            mes += '  seriesIndex : ' + param.seriesIndex;
+            mes += '  dataIndex : ' + param.dataIndex;
+        }
+        if (param.type == 'hover') {
+            document.getElementById('hover-console').innerHTML = 'Event Console : ' + mes;
+        }
+        else {
+            document.getElementById('console').innerHTML = mes;
+        }
+        console.log(param);
+    }
+</script>
+</body>
+</html>

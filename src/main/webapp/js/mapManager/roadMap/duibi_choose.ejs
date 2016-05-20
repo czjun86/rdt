@@ -1,0 +1,36 @@
+<div id="gis-tk-info">
+<div style="font-weight: bold;">对比方式选择</div>
+<div class="gis-tk">
+<ul>
+
+<li>
+<select class="form-control input-small select2me" style="width: 175px !important;" name="chooseType" id="chooseType">
+									<option value="1">时间</option>
+									<option value="2"selected = "true" >运营商</option>
+									
+</select>	
+</li>
+
+
+</ul>
+<ul style="float:right;">
+
+
+<li>
+<div class="form-group choseTime" style="display:none;"  id="reportrange2" >
+	<input type="text"  value='<%=starttime+" - "+endtime%>' id="choseTime" class="form-control" readOnly>												
+</div>
+<div class="dubiOperator" style="margin-top:6px; color:#000;" >
+<%
+if(chooseOp&&chooseOp!=1 && operatoruni=='1'){%><input type="checkbox" name="dubiOperator" value="1"> 联通<%}%>
+<%
+if(chooseOp&&chooseOp!=2 && operatormob=='1'){%><input type="checkbox" name="dubiOperator" value="2"> 移动<%}%>
+<%
+if(chooseOp&&chooseOp!=3 && operatortele=='1'){%><input type="checkbox" name="dubiOperator" value="3"> 电信<%}%>
+</div>
+</li>
+<li style=" margin-top:7px;"><button class="btn blue" onclick="dubiClick('<%=road_id%>')" id="" style="float:right;margin-top:8px;">轨迹对比</button></li>
+
+</ul>
+</div>
+</div>

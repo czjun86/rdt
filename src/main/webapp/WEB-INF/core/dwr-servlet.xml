@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.directwebremoting.org/schema/spring-dwr http://www.directwebremoting.org/schema/spring-dwr-3.0.xsd">
+
+
+<dwr:url-mapping></dwr:url-mapping>
+<dwr:controller id="dwrController" debug="true" >
+    <dwr:config-param name="crossDomainSessionSecurity" value="false"/>
+    <dwr:config-param name="accessLogLevel" value="EXCEPTION"/>   
+    <dwr:config-param name="org.directwebremoting.extend.AjaxFilterManager" value="com.wireless.core.dwr.CustomAjaxFilterManager"/> 
+</dwr:controller>  	
+</beans:beans>

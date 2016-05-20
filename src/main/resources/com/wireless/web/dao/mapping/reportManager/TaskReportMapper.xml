@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.reportManager.TaskReportDao">
+	
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  qry_tasklist_log q 
+		where 
+			q.data_type = 2
+			<if test="starttime != null and starttime !='' ">
+				and q.task_subtime &gt;= #{starttime}
+			</if>
+			<if test="endtime != null and endtime !='' ">
+				and q.task_subtime &lt;= #{endtime}
+			</if>
+			<if test="userId != null">
+			   and q.task_userid = #{userId}
+			</if>
+			<if test="taskName != null and taskName !='' ">
+			   and q.task_name = #{taskName}
+			</if>
+			
+	</select>
+	<select id="queryForList" parameterType="map" resultType="map">
+		select
+			task_id taskId,
+		    task_name taskName,
+		    task_subtime taskSubtime,
+		    task_state taskState,
+		    timegransel,
+		    query_time queryTime,
+		    operator,
+		    telecoms operatorName,
+		    province,
+		    district,
+		    area,
+		    province_name provinceName,
+		    district_name districtName,
+		    area_name areaName,
+		    road_type roadType,
+		    road_level roadLevel,
+		    road_id roadId,
+		    road_name roadName,
+		    show_time showTime,
+		    show_area showArea,
+		    show_road showRoad,
+		    show_operator showOperator,
+		    show_interval showInterval,
+		    show_rsrp rsrp,
+		    show_rsrq rsrq,
+		    show_snr snr,
+		    show_broadband broadband,
+		    show_delay delay,
+		    show_lose lose
+		from  qry_tasklist_log q
+		where 
+			q.data_type = 2
+			<if test="starttime != null and starttime !='' ">
+				and q.task_subtime &gt;= #{starttime}
+			</if>
+			<if test="endtime != null and endtime !='' ">
+				and q.task_subtime &lt;= #{endtime}
+			</if>
+			<if test="userId != null">
+			   and q.task_userid = #{userId}
+			</if>
+			<if test="taskName != null and taskName !='' ">
+			   and q.task_name like concat('%',#{taskName},'%') 
+			</if>
+		order by q.task_subtime desc
+		limit #{lbound},#{pageSize}
+	</select>
+
+	<insert id="addTask" parameterType="map">
+		insert into qry_tasklist_log 
+			  (task_id,task_name,task_userid,timegransel,query_time,operator,
+				telecoms,province,district,area,province_name,district_name,
+				area_name,road_type,road_level,road_id,road_name,show_time,show_area,show_road,show_operator,
+				show_interval,show_rsrp,show_rsrq,show_snr,show_broadband,show_delay,show_lose,task_state,data_type,task_subtime)
+			values (#{uuid},#{taskName},#{userId},#{timegransel},#{queryTime_ps},#{operator},
+					#{operator_ps},#{province},#{district},#{area},#{province_ps},
+					#{district_ps},#{area_ps},#{roadType},#{roadLevel},#{roadId},#{roadName_ps},#{showTime},
+					#{showArea},#{showRoad},#{showOperator},#{showInterval},#{showRsrp_ps},#{showRsrq_ps},
+					#{showSnr_ps},#{showBroadband_ps},#{showDelay_ps},#{showLose_ps},0,2,now())
+	</insert>
+
+</mapper>

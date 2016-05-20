@@ -1,0 +1,74 @@
+<style type="text/css" >
+	#gis-tk-info>ul>li{
+		color: #428bca;
+		padding: 5px 10px;
+		margin-bottom:-10px;
+		cursor:pointer;
+	}
+	#gis-tk-info>ul>li.active_tab{
+		background-color: #428bca;
+		color: #fff;
+	}
+</style>
+<div id="gis-tk-info" style="width: 650px;">
+	<div style="float:left;padding: 5px 0px;"><%=diejia%><%=road_name%></div>
+	<ul  class="nav nav-pills" style="float:right;
+		margin-right:10px;">
+		<li class="active_tab " name="tab_2_1" onclick="infoTable('tab_2_1');">点集合信息</li>
+		<li class="" name="tab_2_2" onclick="infoTable('tab_2_2');">主服信息</li>
+	</ul>
+	<div class="gis-tk" style="float:left;width:100%;">
+		<div class="gis-tk-div" id="tab_2_1" style="float:left;width:100%;">
+			<ul style="width:33%;">
+				<li><span>采样点数量</span><%=count%></li>
+				<li><span>主服务TAC</span><%=tac1%>&nbsp;|&nbsp;<%=tacRate1%></li>
+				<li><span>主ENodeBID</span><%=bid1%>&nbsp;|&nbsp;<%=bidRate1%></li>
+				<li><span>主服务CI</span><%=ci1%>&nbsp;|&nbsp;<%=ciRate1%></li>
+				<li><span>主服务PCI</span><%=pci1%>&nbsp;|&nbsp;<%=pciRate1%></li>
+				<li><span>服务小区数量</span><%=cellCnt%></li>
+				<li><span>性能采样数量</span><%=con%></li>
+				<li><span>服务TAC数量</span><%=tacCnt%></li>
+			</ul>
+			<ul style="width:33%;">
+				<li><span>RSRP</span><%=rsrp%></li>
+				<li><span>RSRQ</span><%=rsrq%></li>
+				<li><span>SNR</span><%=snr%></li>
+				<li><span>时延</span><%=delay%></li>
+				<li><span>覆盖率</span><%=cover%></li>
+				<li><span>下行链路带宽</span><%=link%></li>
+				<li><span>丢包</span><%=lose%></li>
+			</ul>
+			<ul style="width:33%;">
+				<li><span>网络掉线次数</span><%=networkCount%></li>
+				<li><span>业务掉线次数</span><%=pingCount%></li>
+				<li><span>4G切3G次数</span><%=lteToWcdmaCount%></li>
+				<li><span>网络掉线率</span><%=networkRate%></li>
+				<li><span>业务掉线率</span><%=pingRate%></li>
+			</ul>
+		</div>
+		<div class="gis-tk-div" style="display:none;float:left;width:100%;" id="tab_2_2">
+			<ul style="width:33%;">
+				<li><span>主服务CI1</span><%=ci1%>&nbsp;|&nbsp;<%=ciRate1%></li>
+				<li><span>主服务CI2</span><%=ci2%>&nbsp;|&nbsp;<%=ciRate2%></li>
+				<li><span>主服务CI3</span><%=ci3%>&nbsp;|&nbsp;<%=ciRate3%></li>
+				<li><span>主服务CI4</span><%=ci4%>&nbsp;|&nbsp;<%=ciRate4%></li>
+				<li><span>主服务CI5</span><%=ci5%>&nbsp;|&nbsp;<%=ciRate5%></li>
+			</ul>
+			<ul style="width:33%;">
+				<li><span>主服务PCI1</span><%=pci1%>&nbsp;|&nbsp;<%=pciRate1%></li>
+				<li><span>主服务PCI2</span><%=pci2%>&nbsp;|&nbsp;<%=pciRate2%></li>
+				<li><span>主服务PCI3</span><%=pci3%>&nbsp;|&nbsp;<%=pciRate3%></li>
+				<li><span>主服务PCI4</span><%=pci4%>&nbsp;|&nbsp;<%=pciRate4%></li>
+				<li><span>主服务PCI5</span><%=pci5%>&nbsp;|&nbsp;<%=pciRate5%></li>
+			</ul>
+			<ul style="width:33%;">
+				<li><span>主服务TAC1</span><%=tac1%>&nbsp;|&nbsp;<%=tacRate1%></li>
+				<li><span>主服务TAC2</span><%=tac2%>&nbsp;|&nbsp;<%=tacRate2%></li>
+				<li><span>主服务TAC3</span><%=tac3%>&nbsp;|&nbsp;<%=tacRate3%></li>
+				<li><span>主服务TAC4</span><%=tac4%>&nbsp;|&nbsp;<%=tacRate4%></li>
+				<li><span>主服务TAC5</span><%=tac5%>&nbsp;|&nbsp;<%=tacRate5%></li>
+			</ul>
+			
+		</div>
+	</div>
+</div>

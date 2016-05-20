@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.reportManager.AreaDao">
+	<select id="queryArea" resultType="com.wireless.web.model.Area" parameterType="string">
+		SELECT
+			r.region_code id,
+			r.region_name text,
+			r.parent_id parentid
+		FROM
+			t_cms_region_dic r
+			where 1=1
+			and r.region_code like #{firstId}
+		ORDER BY
+			r.region_code
+	</select>
+	
+	<select id="getProvince" resultType="com.wireless.web.model.Area">
+		select r.region_code id,r.region_name text,r.parent_id parentid 
+			from t_cms_region_dic r where r.parent_id = 0 order by r.region_code
+	</select>
+	
+	<select id="getChildren" resultType="com.wireless.web.model.Area">
+		select r.region_code id,r.region_name text,r.parent_id parentid 
+			from t_cms_region_dic r where r.parent_id = #{id} order by r.region_code
+	</select>
+	<select id="getLevel" resultType="com.wireless.web.model.Area">
+		select r.region_code id,r.region_name text,r.parent_id parentid 
+			from t_cms_region_dic r where r.level = #{id} order by r.region_code
+	</select>
+	<select id="getBrother" resultType="com.wireless.web.model.Area">
+		select r.region_code id,r.region_name text,r.parent_id parentid 
+			from t_cms_region_dic r ,(select * from t_cms_region_dic where region_code = #{id}) t
+			where r.parent_id = t.parent_id order by r.region_code
+	</select>
+	
+	<select id="queryCounty" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.level=1 order by r.region_code
+	</select>
+	
+	<select id="queryCountyById" parameterType="java.lang.String" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.level=1 and r.region_code = #{id} order by r.region_code
+	</select>
+	
+	<select id="queryCity" parameterType="java.lang.String" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.parent_id=#{id} order by r.region_code
+	</select>
+	<select id="queryThisArea" parameterType="java.lang.String" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.region_code=#{id} order by r.region_code
+	</select>
+	<select id="queryChildrenById" parameterType="map" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.parent_id=#{id}
+			and r.region_code = #{did} order by r.region_code
+	</select>
+	
+	<select id="queryThird" parameterType="java.lang.String" resultType="com.wireless.web.model.Area">
+		select r.region_code id ,r.region_name text ,r.parent_id parentid from 
+			t_cms_region_dic r where r.region_code=#{id} order by r.region_code
+	</select>
+	
+	<select id="queryQuotas" resultType="com.wireless.web.model.Quotas" parameterType="map">
+		SELECT
+			t.telecoms operator,
+			t.network netWork,
+			t.kpi_class kpiClass,
+			t.kpi_type kpiType,
+			t.kpi_name kpiName,
+			t.ref_min_value refMinValuel,
+			t.ref_max_value refMaxValuel,
+				t.interval_value_one interValuelOne,
+t.interval_value_two interValuelTwo,
+t.interval_value_three interValuelThree,
+t.interval_value_four interValuelFour,
+t.interval_value_five interValuelFive,
+			t.kpi_unit kpiUnit,
+			t.kpi_comment kpiComment
+		FROM
+			t_cms_kpi_dic t
+		WHERE
+			t.telecoms = #{operator}
+		AND t.network = #{netType}
+		<!-- AND t.kpi_class = #{kpiClass} -->
+		AND t.is_enable = 1
+		ORDER BY
+			t.id
+	</select>
+	
+	<select id="getRoad" resultType="com.wireless.web.model.Area" parameterType="map">
+		SELECT
+			DISTINCT i.road_id id,
+			case when i.type = 1 then i.road_name when i.type = 2 then i.bridge_name when i.type = 3 then i.tunnel_name end text
+		FROM
+			T_RT_REGION_ROAD r,
+			T_RT_ROAD_INFO i
+		WHERE
+			r.road_id = i.road_id
+		<if test="areaId != null and areaId != '-1'">
+			and r.region_code like #{areaId}
+		</if>
+		<if test="roadType != null and roadType != -1">
+			and i.type = #{roadType}
+		</if>
+		<if test="roadLevel != null and roadLevel != -1">
+			and i.level = #{roadLevel}
+		</if>
+		ORDER BY i.road_id
+		limit 0,10
+	</select>
+	<select id="getAutocompleteRoad" resultType="com.wireless.web.model.Area" parameterType="map">
+		SELECT r.* FROM
+		(
+			SELECT
+				DISTINCT i.road_id id,
+				case when i.type = 1 then i.road_name when i.type = 2 then i.bridge_name when i.type = 3 then i.tunnel_name end text
+			FROM
+				T_RT_REGION_ROAD r,
+				T_RT_ROAD_INFO i
+			WHERE
+				r.road_id = i.road_id
+			<if test="area != null and area != '-1'">
+				and r.region_code like #{area}
+			</if>
+			<if test="roadType != null and roadType != -1">
+				and i.type = #{roadType}
+			</if>
+			<if test="roadLevel != null and roadLevel != -1">
+				and i.level = #{roadLevel}
+			</if>
+			ORDER BY i.road_id
+		) r where 1 = 1
+		<if test="roadName != null">
+		and	r.text like #{roadName}
+		</if>
+		limit 0,10
+	</select>
+	<!-- 道路信息 -->
+	<select id="queryRoadInfo" parameterType="map" resultType="com.wireless.web.model.RoadInfo4ESBean">
+		select
+		    if((c.level2_name like '%市辖区%'),c.level1_name,c.level2_name) cityName,
+		    c.region_name countryName,
+		    case when a.type=1 then a.road_name when a.type=2 then a.bridge_name when a.type=3 then a.tunnel_name end roadName,
+		    b.region_code regionCode,
+		    c.parent_id parentId,
+		    a.road_id roadId,
+		    a.type roadType,
+		    a.level roadLevel,
+		    concat(substr(c.region_code,1,2),'0000') superId,
+		    level1_name superName
+		from t_rt_road_info a,t_rt_region_road b,t_cms_region_dic c
+		where 1=1
+		    and a.road_id=b.road_id
+		    and b.region_code=c.region_code
+		<if test="area != null and area != '-1'">
+			and c.region_code = #{area}
+		</if>
+		<if test="district != null and district != '-1'">
+			and c.parent_id = #{district}
+		</if>
+		<if test="province != null and province != '-1'">
+			and concat(substr(c.region_code,1,2),'0000') = #{province}
+		</if>
+		<if test="roadType != null and roadType != -1">
+			and a.type = #{roadType}
+		</if>
+		<if test="roadLevel != null and roadLevel != -1">
+			and a.level = #{roadLevel}
+		</if>
+	</select>
+	
+	<select id="getRoadName" parameterType="java.lang.String" resultType="java.lang.String">
+		select case 
+		when r.type = 1 then r.road_name 
+		when r.type = 2 then r.bridge_name 
+		when r.type = 3 then r.tunnel_name end roadName
+		 from t_rt_road_info r where r.road_id=#{roadId} 
+	</select>
+</mapper>

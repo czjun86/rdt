@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.reportManager.ComprehensiveDao">
+
+	<select id="kpiAnalysis" statementType="CALLABLE"
+		parameterType="map">    
+		<![CDATA[
+			call pr_qry_mid_kpi_analysis(
+			#{uuid,mode=IN,jdbcType=DECIMAL},
+			#{userId,mode=IN,jdbcType=DECIMAL},
+			#{operator,mode=IN,jdbcType=DECIMAL},
+			#{timegransel,mode=IN,jdbcType=DECIMAL},
+			#{starttime,mode=IN,jdbcType=VARCHAR},
+			#{endtime,mode=IN,jdbcType=VARCHAR},
+			#{telecoms,mode=IN,jdbcType=VARCHAR},
+			#{province,mode=IN,jdbcType=VARCHAR},
+			#{district,mode=IN,jdbcType=VARCHAR},
+			#{area,mode=IN,jdbcType=VARCHAR},
+			#{roadType,mode=IN,jdbcType=DECIMAL},
+			#{roadLevel,mode=IN,jdbcType=DECIMAL},
+			#{roadId,mode=IN,jdbcType=DECIMAL},
+			#{imei,mode=IN,jdbcType=VARCHAR},
+			#{threshold,mode=IN,jdbcType=DECIMAL},
+			#{showTime,mode=IN,jdbcType=DECIMAL},
+			#{showArea,mode=IN,jdbcType=DECIMAL},
+			#{showRoad,mode=IN,jdbcType=DECIMAL},
+			#{showOperator,mode=IN,jdbcType=DECIMAL},
+			#{showInterval,mode=IN,jdbcType=DECIMAL},
+			#{flag,mode=OUT,jdbcType=DECIMAL}
+			)
+		]]>
+	</select>
+	
+	<select id="queryUserInterval" resultType="map" parameterType="map">
+		select
+		    max(if(kpi_type=1,range1,null)) rsrpRange1,
+		    max(if(kpi_type=1,range2,null)) rsrpRange2,
+		    max(if(kpi_type=1,range3,null)) rsrpRange3,
+		    max(if(kpi_type=1,range4,null)) rsrpRange4,
+		    max(if(kpi_type=1,range5,null)) rsrpRange5,
+		    max(if(kpi_type=1,range6,null)) rsrpRange6,
+		    max(if(kpi_type=2,range1,null)) snrRange1,
+		    max(if(kpi_type=2,range2,null)) snrRange2,
+		    max(if(kpi_type=2,range3,null)) snrRange3,
+		    max(if(kpi_type=2,range4,null)) snrRange4,
+		    max(if(kpi_type=2,range5,null)) snrRange5,
+		    max(if(kpi_type=2,range6,null)) snrRange6,
+		    max(if(kpi_type=3,range1,null)) rsrqRange1,
+		    max(if(kpi_type=3,range2,null)) rsrqRange2,
+		    max(if(kpi_type=3,range3,null)) rsrqRange3,
+		    max(if(kpi_type=3,range4,null)) rsrqRange4,
+		    max(if(kpi_type=3,range5,null)) rsrqRange5,
+		    max(if(kpi_type=3,range6,null)) rsrqRange6,
+		    max(if(kpi_type=4,range1,null)) bwRange1,
+		    max(if(kpi_type=4,range2,null)) bwRange2,
+		    max(if(kpi_type=4,range3,null)) bwRange3,
+		    max(if(kpi_type=4,range4,null)) bwRange4,
+		    max(if(kpi_type=4,range5,null)) bwRange5,
+		    max(if(kpi_type=4,range6,null)) bwRange6,
+		    max(if(kpi_type=5,range1,null)) delayRange1,
+		    max(if(kpi_type=5,range2,null)) delayRange2,
+		    max(if(kpi_type=5,range3,null)) delayRange3,
+		    max(if(kpi_type=5,range4,null)) delayRange4,
+		    max(if(kpi_type=5,range5,null)) delayRange5,
+		    max(if(kpi_type=5,range6,null)) delayRange6,
+		    max(if(kpi_type=6,range1,null)) loseRange1,
+		    max(if(kpi_type=6,range2,null)) loseRange2,
+		    max(if(kpi_type=6,range3,null)) loseRange3,
+		    max(if(kpi_type=6,range4,null)) loseRange4,
+		    max(if(kpi_type=6,range5,null)) loseRange5,
+		    max(if(kpi_type=6,range6,null)) loseRange6
+		from(
+		    select
+		        a.userid,
+		        a.telecoms,
+		        a.kpi_type,
+		        case range_one_state
+		            when 1 then concat('(',range_one_start,',',range_one_end,')')
+		            when 2 then concat('[',range_one_start,',',range_one_end,']')
+		            when 3 then concat('(',range_one_start,',',range_one_end,']')
+		            when 4 then concat('[',range_one_start,',',range_one_end,')')
+		            end range1,
+		        case range_two_state
+		            when 1 then concat('(',range_two_start,',',range_two_end,')')
+		            when 2 then concat('[',range_two_start,',',range_two_end,']')
+		            when 3 then concat('(',range_two_start,',',range_two_end,']')
+		            when 4 then concat('[',range_two_start,',',range_two_end,')')
+		            end range2,
+		        case range_three_state
+		            when 1 then concat('(',range_three_start,',',range_three_end,')')
+		            when 2 then concat('[',range_three_start,',',range_three_end,']')
+		            when 3 then concat('(',range_three_start,',',range_three_end,']')
+		            when 4 then concat('[',range_three_start,',',range_three_end,')')
+		            end range3,
+		        case range_four_state
+		            when 1 then concat('(',range_four_start,',',range_four_end,')')
+		            when 2 then concat('[',range_four_start,',',range_four_end,']')
+		            when 3 then concat('(',range_four_start,',',range_four_end,']')
+		            when 4 then concat('[',range_four_start,',',range_four_end,')')
+		            end range4,
+		        case range_five_state
+		            when 1 then concat('(',range_five_start,',',range_five_end,')')
+		            when 2 then concat('[',range_five_start,',',range_five_end,']')
+		            when 3 then concat('(',range_five_start,',',range_five_end,']')
+		            when 4 then concat('[',range_five_start,',',range_five_end,')')
+		            end range5,
+		        case range_six_state
+		            when 1 then concat('(',range_six_start,',',range_six_end,')')
+		            when 2 then concat('[',range_six_start,',',range_six_end,']')
+		            when 3 then concat('(',range_six_start,',',range_six_end,']')
+		            when 4 then concat('[',range_six_start,',',range_six_end,')')
+		            end range6
+		    from(
+		    select
+		        if(@kpi_type=a.kpi_type,@rw:=@rw+1,@rw:=1) rw,
+		        @kpi_type:=kpi_type x,
+		        a.*
+		    from t_rt_kpi_settings a,(
+		        select @kpi_type:=null,@rw:=1
+		    )b
+		    where 1=1
+		        and a.userid in(0,#{userId})
+		        and a.kpi_type in(1,2,3,4,5,6)
+		        and a.telecoms=#{operator}
+		    order by a.kpi_type asc,a.userid desc,modify_time desc
+		    )a
+		    where a.rw=1
+		)a
+	</select>
+	
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  qry_kpi_analysis q where q.qry_uuid = #{uuid}
+	</select>
+	<select id="queryForList" parameterType="map" resultType="map">
+		select
+			qry_uuid,
+			start_time,
+			end_time,
+			level2_code,
+			parent_region,
+			region_name,
+			region_code,
+			<!-- case road_type when 1 then '道路' when 2 then '桥梁' when 3 then '隧道' else '-1' end road_type,
+	        case road_level
+	            when 1 then '主干路'
+	            when 2 then '次干路'
+	            when 3 then '高速公路'
+	            when 4 then '国道'
+	            when 5 then '省道'
+	            when 6 then '县道'
+	            when 7 then '乡村道路'
+	            else '-1' end road_level, -->
+            road_type,
+            road_level,
+	        road_id,
+			road_name,
+			case telecoms when 1 then '联通' when 2 then '移动' when 3 then '电信' else 'N/A' end telecoms,
+			ifnull(road_test_mileage,'N/A') road_test_mileage,
+			ifnull(road_cover_mileage,'N/A') road_cover_mileage,
+			ifnull(road_poor_mileage,'N/A') road_poor_mileage,
+			ifnull(road_cover_rate,'N/A') road_cover_rate,
+			ifnull(point_signal,'N/A') point_signal,
+			ifnull(point_business,'N/A') point_business,
+			ifnull(point_poor_coverage,'N/A') point_poor_coverage,
+			ifnull(road_cover_rate,'N/A') wireless_coverage,
+			ifnull(num_network_drop,'N/A') network_count,
+			ifnull(rate_network_drop,'N/A') network_rate,
+			ifnull(num_ping_drop,'N/A') ping_count,
+			ifnull(rate_ping_drop,'N/A') ping_rate,
+			ifnull(num_network_43,'N/A') network_change,
+			ifnull(lte_rsrp,'N/A') lte_rsrp,
+			ifnull(lte_rsrq,'N/A') lte_rsrq,
+			ifnull(lte_snr,'N/A') lte_snr,
+			ifnull(bw_link,'N/A') bw_link,
+			ifnull(ping_avg_delay,'N/A') ping_avg_delay,
+			ifnull(ping_lose_rate,'N/A') ping_lose_rate,
+			ifnull(rsrp_avg,'N/A') rsrp_avg,
+			rsrp_ratio1,
+			rsrp_range1 rsrp_point1,
+			rsrp_ratio2,
+			rsrp_range2 rsrp_point2,
+			rsrp_ratio3,
+			rsrp_range3 rsrp_point3,
+			rsrp_ratio4,
+			rsrp_range4 rsrp_point4,
+			rsrp_ratio5,
+			rsrp_range5 rsrp_point5,
+			rsrp_ratio6,
+			rsrp_range6 rsrp_point6,
+			ifnull(rsrq_avg,'N/A') rsrq_avg,
+			rsrq_ratio1,
+			rsrq_range1 rsrq_point1,
+			rsrq_ratio2,
+			rsrq_range2 rsrq_point2,
+			rsrq_ratio3,
+			rsrq_range3 rsrq_point3,
+			rsrq_ratio4,
+			rsrq_range4 rsrq_point4,
+			rsrq_ratio5,
+			rsrq_range5 rsrq_point5,
+			rsrq_ratio6,
+			rsrq_range6 rsrq_point6,
+			ifnull(snr_avg,'N/A') snr_avg,
+			snr_ratio1,
+			snr_range1 snr_point1,
+			snr_ratio2,
+			snr_range2 snr_point2,
+			snr_ratio3,
+			snr_range3 snr_point3,
+			snr_ratio4,
+			snr_range4 snr_point4,
+			snr_ratio5,
+			snr_range5 snr_point5,
+			snr_ratio6,
+			snr_range6 snr_point6,
+			ifnull(bw_link_avg,'N/A') bw_link_avg,
+			ifnull(round(bw_link_rate,2),'N/A') bw_link_rate,
+			bw_link_ratio1,
+			bw_link_range1 bw_link_point1,
+			bw_link_ratio2,
+			bw_link_range2 bw_link_point2,
+			bw_link_ratio3,
+			bw_link_range3 bw_link_point3,
+			bw_link_ratio4,
+			bw_link_range4 bw_link_point4,
+			bw_link_ratio5,
+			bw_link_range5 bw_link_point5,
+			bw_link_ratio6,
+			bw_link_range6 bw_link_point6,
+			ifnull(ping_delay_avg,'N/A') ping_delay_avg,
+			ping_delay_ratio1,
+			ping_delay_range1 ping_delay_point1,
+			ping_delay_ratio2,
+			ping_delay_range2 ping_delay_point2,
+			ping_delay_ratio3,
+			ping_delay_range3 ping_delay_point3,
+			ping_delay_ratio4,
+			ping_delay_range4 ping_delay_point4,
+			ping_delay_ratio5,
+			ping_delay_range5 ping_delay_point5,
+			ping_delay_ratio6,
+			ping_delay_range6 ping_delay_point6,
+			ifnull(ping_lose_avg,'N/A') ping_lose_avg,
+			ping_lose_ratio1,
+			ping_lose_range1 ping_lose_point1,
+			ping_lose_ratio2,
+			ping_lose_range2 ping_lose_point2,
+			ping_lose_ratio3,
+			ping_lose_range3 ping_lose_point3,
+			ping_lose_ratio4,
+			ping_lose_range4 ping_lose_point4,
+			ping_lose_ratio5,
+			ping_lose_range5 ping_lose_point5,
+			ping_lose_ratio6,
+			ping_lose_range6 ping_lose_point6,
+			create_time
+		from  qry_kpi_analysis q
+		where q.qry_uuid = #{uuid}
+		order by q.start_time desc,q.road_cover_rate asc
+		limit #{lbound},#{pageSize}
+	</select>
+	<select id="exportList" parameterType="map" resultType="map">
+		select
+			qry_uuid,
+			start_time,
+			end_time,
+			level2_code,
+			parent_region,
+			region_name,
+			region_code,
+			case road_type when 1 then '道路' when 2 then '桥梁' when 3 then '隧道' else 'N/A' end road_type,
+	        case road_level
+	            when 1 then '主干路'
+	            when 2 then '次干路'
+	            when 3 then '高速公路'
+	            when 4 then '国道'
+	            when 5 then '省道'
+	            when 6 then '县道'
+	            when 7 then '乡村道路'
+	            else 'N/A' end road_level,
+	        road_id,
+			road_name,
+			case telecoms when 1 then '联通' when 2 then '移动' when 3 then '电信' else 'N/A' end telecoms,
+			ifnull(road_test_mileage,'N/A') road_test_mileage,
+			ifnull(road_cover_mileage,'N/A') road_cover_mileage,
+			ifnull(road_poor_mileage,'N/A') road_poor_mileage,
+			ifnull(road_cover_rate,'N/A') road_cover_rate,
+			ifnull(point_signal,'N/A') point_signal,
+			ifnull(point_business,'N/A') point_business,
+			ifnull(point_poor_coverage,'N/A') point_poor_coverage,
+			ifnull(road_cover_rate,'N/A') wireless_coverage,
+			ifnull(num_network_drop,'N/A') network_count,
+			ifnull(rate_network_drop,'N/A') network_rate,
+			ifnull(num_ping_drop,'N/A') ping_count,
+			ifnull(rate_ping_drop,'N/A') ping_rate,
+			ifnull(num_network_43,'N/A') network_change,
+			ifnull(lte_rsrp,'N/A') lte_rsrp,
+			ifnull(lte_rsrq,'N/A') lte_rsrq,
+			ifnull(lte_snr,'N/A') lte_snr,
+			ifnull(bw_link,'N/A') bw_link,
+			ifnull(ping_avg_delay,'N/A') ping_avg_delay,
+			ifnull(ping_lose_rate,'N/A') ping_lose_rate,
+			ifnull(rsrp_avg,'N/A') rsrp_avg,
+			rsrp_ratio1,
+			rsrp_range1 rsrp_point1,
+			rsrp_ratio2,
+			rsrp_range2 rsrp_point2,
+			rsrp_ratio3,
+			rsrp_range3 rsrp_point3,
+			rsrp_ratio4,
+			rsrp_range4 rsrp_point4,
+			rsrp_ratio5,
+			rsrp_range5 rsrp_point5,
+			rsrp_ratio6,
+			rsrp_range6 rsrp_point6,
+			ifnull(rsrq_avg,'N/A') rsrq_avg,
+			rsrq_ratio1,
+			rsrq_range1 rsrq_point1,
+			rsrq_ratio2,
+			rsrq_range2 rsrq_point2,
+			rsrq_ratio3,
+			rsrq_range3 rsrq_point3,
+			rsrq_ratio4,
+			rsrq_range4 rsrq_point4,
+			rsrq_ratio5,
+			rsrq_range5 rsrq_point5,
+			rsrq_ratio6,
+			rsrq_range6 rsrq_point6,
+			ifnull(snr_avg,'N/A') snr_avg,
+			snr_ratio1,
+			snr_range1 snr_point1,
+			snr_ratio2,
+			snr_range2 snr_point2,
+			snr_ratio3,
+			snr_range3 snr_point3,
+			snr_ratio4,
+			snr_range4 snr_point4,
+			snr_ratio5,
+			snr_range5 snr_point5,
+			snr_ratio6,
+			snr_range6 snr_point6,
+			ifnull(bw_link_avg,'N/A') bw_link_avg,
+			round(bw_link_rate,2) bw_link_rate,
+			bw_link_ratio1,
+			bw_link_range1 bw_link_point1,
+			bw_link_ratio2,
+			bw_link_range2 bw_link_point2,
+			bw_link_ratio3,
+			bw_link_range3 bw_link_point3,
+			bw_link_ratio4,
+			bw_link_range4 bw_link_point4,
+			bw_link_ratio5,
+			bw_link_range5 bw_link_point5,
+			bw_link_ratio6,
+			bw_link_range6 bw_link_point6,
+			ifnull(ping_delay_avg,'N/A') ping_delay_avg,
+			ping_delay_ratio1,
+			ping_delay_range1 ping_delay_point1,
+			ping_delay_ratio2,
+			ping_delay_range2 ping_delay_point2,
+			ping_delay_ratio3,
+			ping_delay_range3 ping_delay_point3,
+			ping_delay_ratio4,
+			ping_delay_range4 ping_delay_point4,
+			ping_delay_ratio5,
+			ping_delay_range5 ping_delay_point5,
+			ping_delay_ratio6,
+			ping_delay_range6 ping_delay_point6,
+			ifnull(ping_lose_avg,'N/A') ping_lose_avg,
+			ping_lose_ratio1,
+			ping_lose_range1 ping_lose_point1,
+			ping_lose_ratio2,
+			ping_lose_range2 ping_lose_point2,
+			ping_lose_ratio3,
+			ping_lose_range3 ping_lose_point3,
+			ping_lose_ratio4,
+			ping_lose_range4 ping_lose_point4,
+			ping_lose_ratio5,
+			ping_lose_range5 ping_lose_point5,
+			ping_lose_ratio6,
+			ping_lose_range6 ping_lose_point6,
+			create_time
+		from  qry_kpi_analysis q
+		where q.qry_uuid = #{uuid}
+		order by q.start_time desc,q.road_cover_rate asc
+	</select>
+</mapper>

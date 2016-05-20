@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.CollectionManager.CollectionDao">
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  (<include refid="query"/>) t
+	</select>
+	<select id="queryForList" parameterType="map" resultType="map">
+	select t.* from  (<include refid="query"/>) t
+		limit #{lbound},#{pageSize}
+	</select>
+	<sql id="query">
+		select t.id ,t.name ,t.desc ,t.content ,t.is_collect ,t.is_complex ,t.is_del ,t.update_time ,t.create_time
+			from T_RT_RULE_SETTINGS t
+		WHERE 1=1
+			AND t.is_del=0
+		<if test="name != null">
+			AND t.name like #{name}
+		</if>
+		<if test="starttime != null and starttime != '' ">
+			AND t.update_time &gt;= #{starttime}
+		</if>
+		<if test="endtime != null and endtime != '' ">
+			AND t.update_time &lt;= #{endtime}
+		</if>
+		ORDER BY t.update_time DESC
+	</sql>
+	<update id="update" parameterType="map">
+	UPDATE t_rt_rule_settings SET 
+	`name`=#{name},`desc`=#{desc}, content=#{content}, is_collect=#{is_collect}, 
+	is_complex=#{is_complex}, is_del=#{is_del}, update_time=#{update_time} WHERE id=#{id};
+	</update>
+	<insert id="insert" parameterType="map">
+	INSERT INTO t_rt_rule_settings 
+	( `name`, `desc`, content, is_collect, is_complex, is_del, update_time, create_time) 
+	VALUES (#{name}, #{desc},#{content}, #{is_collect}, #{is_complex}, #{is_del}, #{update_time}, #{create_time});
+	</insert>
+	<select id="isUsed" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT
+			COUNT(1) num
+		FROM
+			t_rt_ep_info t
+		WHERE
+			t.is_del = 0
+		AND t.rule_name IN (
+			SELECT
+				s. NAME
+			FROM
+				t_rt_rule_settings s
+			WHERE
+				s.id = #{id}
+		)
+	</select>
+	<update id="delete" parameterType="map">
+		UPDATE t_rt_rule_settings SET is_del=#{is_del}, update_time=#{update_time} WHERE id=#{id};
+	</update>
+	<select id="queryCollection" parameterType="java.lang.Integer" resultType="map">
+		select t.id ,t.name ,t.desc ,t.content ,t.is_collect ,t.is_complex ,t.is_del ,t.update_time ,t.create_time
+			from T_RT_RULE_SETTINGS t
+		WHERE t.id = #{id}
+	</select>
+	<select id="checkName" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select t.id from t_rt_rule_settings t where t.name= #{name} and t.is_del=0
+	</select>
+</mapper>

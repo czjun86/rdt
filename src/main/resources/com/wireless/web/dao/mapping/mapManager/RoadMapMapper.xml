@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.mapManager.RoadMapDao">
+<!-- 根据用户ID查询出对应的一级行政区域名称 -->
+	<select id="getAreaNameByUserId" parameterType="map"
+		resultType="com.wireless.web.model.Area" >
+		SELECT d.region_code id,level2_name state,
+		d.level1_name text
+		FROM
+		t_cms_region_dic d
+		WHERE
+		d.region_code = (
+		SELECT
+		u.province
+		FROM
+		t_user u where u.userid=#{userId})
+	</select>
+	<select id="getKpi"  parameterType="map"	resultType="com.wireless.web.model.KpiSettings">
+select 
+  kpi_type,
+  kpi_name,
+  range_one_start,
+  range_one_end,
+  range_one_state,
+  range_two_start,
+  range_two_end,
+  range_two_state,
+  range_three_start,
+  range_three_end,
+  range_three_state,
+  range_four_start,
+  range_four_end,
+  range_four_state,
+  range_five_start,
+  range_five_end,
+  range_five_state,
+  range_six_start,
+  range_six_end,
+  range_six_state,
+  range_one_color,
+  range_two_color,
+  range_three_color,
+  range_four_color,
+  range_five_color,
+  range_six_color,
+  shape,
+  shape_id,
+  userid,
+  telecoms from t_rt_kpi_settings where userid=#{vo.userId} and telecoms=#{vo.operator}  
+  <if test="isWarn !=null and isWarn==0">
+  and kpi_type=#{vo.kpiType} 
+  </if>
+    <if test="isWarn !=null and isWarn==1">
+ and kpi_type=#{vo.warn} 
+  </if>
+</select>
+
+	
+	<!-- 采样点调用存储过程 -->
+	  <select id="getPro" statementType="CALLABLE" parameterType="map" resultType="BigDecimal">    
+	<![CDATA[
+	call pr_qry_gis_road_analysis(
+	#{vo.uuid,mode=IN,jdbcType=VARCHAR},
+	#{vo.userId,mode=IN,jdbcType=NUMERIC},
+	#{vo.starttime,mode=IN,jdbcType=VARCHAR}, 
+	#{vo.endtime,mode=IN,jdbcType=VARCHAR},
+	#{vo.operator,mode=IN,jdbcType=VARCHAR},
+	#{vo.kpiType,mode=IN,jdbcType=NUMERIC},
+	#{vo.province,mode=IN,jdbcType=VARCHAR},
+	#{vo.district,mode=IN,jdbcType=VARCHAR},
+	#{vo.area,mode=IN,jdbcType=VARCHAR},
+	#{vo.roadType,mode=IN,jdbcType=NUMERIC},
+	#{vo.roadLevel,mode=IN,jdbcType=NUMERIC},
+	#{vo.roadId,mode=IN,jdbcType=VARCHAR},
+	#{vo.level,mode=IN,jdbcType=NUMERIC},
+	#{vo.dubiOperator,mode=IN,jdbcType=VARCHAR},
+	#{rs,mode=OUT,jdbcType=NUMERIC}
+	) ]]>  
+</select>
+
+	<!-- 采样点均值存储过程--> 
+	  <select id="getProAvgPoint" statementType="CALLABLE" parameterType="map" resultType="map">    
+	<![CDATA[
+	call pr_qry_gis_box_analysis_road(
+	#{vo.uuid,mode=IN,jdbcType=VARCHAR},
+	#{vo.points,mode=IN,jdbcType=VARCHAR}, 
+	#{vo.kpiInterv,mode=IN,jdbcType=VARCHAR}, 
+	#{vo.operator,mode=IN,jdbcType=VARCHAR}, 
+	#{signalCount,mode=OUT,jdbcType=VARCHAR},
+	#{busCount,mode=OUT,jdbcType=VARCHAR},
+	#{rsrp,mode=OUT,jdbcType=VARCHAR},
+	#{rsrq,mode=OUT,jdbcType=VARCHAR},
+	#{snr,mode=OUT,jdbcType=VARCHAR},
+	#{link,mode=OUT,jdbcType=VARCHAR},
+	#{lose,mode=OUT,jdbcType=VARCHAR},
+	#{delay,mode=OUT,jdbcType=VARCHAR},
+	#{rs,mode=OUT,jdbcType=NUMERIC}
+	) ]]>    
+	</select>
+	<!-- 查询道路点 集合-->
+	<select id="getPot"  resultType="com.wireless.web.model.Pot" parameterType="map">
+select 
+qry_id id,
+kpi_interval inter,
+kpi_color  state,
+bd_latitude  lat ,
+telecoms,
+bd_longitude lng 
+
+from qry_gis_road_analysis  d where qry_uuid=#{vo.uuid} and kpi_interval>0 
+</select>
+	<!-- 点击查询单个道路点详情 -->
+
+<select id="getPoint"  resultType="com.wireless.web.model.RoadPoints" parameterType="map">
+select 
+kpi_interval inter,
+kpi_color  state,
+road_id,
+road_name,
+bd_latitude  lat ,
+bd_longitude lng ,
+point_signal count,
+point_business con,
+enode_bid_top1 bid1,
+ci_top1 ci1,
+ci_top2 ci2,
+ci_top3 ci3,
+ci_top4 ci4,
+ci_top5 ci5,
+pci_top1 pci1,
+pci_top2 pci2,
+pci_top3 pci3,
+pci_top4 pci4,
+pci_top5 pci5,
+cell_cnt cellCnt,
+tac_top1 tac1,
+tac_top2 tac2,
+tac_top3 tac3,
+tac_top4 tac4,
+tac_top5 tac5,
+tac_cnt tacCnt,
+ CONCAT(lte_rsrp,'dBm') rsrp ,
+ CONCAT(lte_rsrq,'dB') rsrq ,
+ CONCAT(lte_snr,'dB') snr ,
+ case when concat(cover_rate,'')='N/A'  then 'N/A' else CONCAT(cover_rate,'%') end  cover,
+ case when bw_link=-998 or concat(bw_link,'')='N/A' then 'N/A' else CONCAT(bw_link,'Mbps') end  link,
+ case when ping_avg_delay=-998 or concat(ping_avg_delay,'')='N/A' then 'N/A' else CONCAT(ping_avg_delay,'ms') end delay,
+ case when ping_lose_rate=-998 or concat(ping_lose_rate,'')='N/A' then 'N/A' else CONCAT(ping_lose_rate,'%')  end lose
+
+from qry_gis_road_analysis  d where qry_uuid=#{vo.uuid} and kpi_interval>0 
+<if test="vo.id!=null">
+and qry_id=#{vo.id}
+</if>
+</select>
+
+<select id="getPointExcel"  parameterType="map" resultType="map">
+select 
+kpi_interval inter,
+kpi_color  state,
+telecoms,
+road_id,
+road_name,
+bd_latitude  lat ,
+bd_longitude lng ,
+point_signal count,
+point_business con,
+enode_bid_top1 bid1,
+ci_top1 ci1,
+ci_top2 ci2,
+ci_top3 ci3,
+ci_top4 ci4,
+ci_top5 ci5,
+pci_top1 pci1,
+pci_top2 pci2,
+pci_top3 pci3,
+pci_top4 pci4,
+pci_top5 pci5,
+cell_cnt cellCnt,
+tac_top1 tac1,
+tac_top2 tac2,
+tac_top3 tac3,
+tac_top4 tac4,
+tac_top5 tac5,
+tac_cnt tacCnt,
+lte_rsrp rsrp,
+lte_rsrq rsrq,
+lte_snr snr,
+case when concat(cover_rate,'')='N/A'  then 'N/A' else cover_rate end  cover,
+ case when bw_link=-998 or concat(bw_link,'')='N/A' then 'N/A' else bw_link end  link,
+ case when ping_avg_delay=-998 or concat(ping_avg_delay,'')='N/A' then 'N/A' else ping_avg_delay end delay,
+ case when ping_lose_rate=-998 or concat(ping_lose_rate,'')='N/A' then 'N/A' else ping_lose_rate  end lose
+from qry_gis_road_analysis  d where qry_uuid=#{vo.uuid} and 7>kpi_interval and telecoms=#{vo.operator} and kpi_interval>0 and  INSTR(#{vo.kpiInterv},kpi_interval)>0 
+	<if test="vo.points != null and vo.points != '' ">
+	and is_box=1
+	</if>
+</select>
+
+<!-- 点击查询单个道路点详情 -->
+<select id="getRoadPoint"  parameterType="map" resultType="com.wireless.web.model.Pot">
+	select
+	    point_code id,
+	    bd_longitude lng,
+	    bd_latitude lat
+	from(
+	    select
+	        a.uuid point_code,
+	        a.bd_longitude,
+	        a.bd_latitude,
+	        if(@lng=a.bd_longitude and @lat=a.bd_latitude,@rw:=@rw+1,@rw:=1) rw,
+	        @lng:=a.bd_longitude x1,
+	        @lat:=a.bd_latitude x2
+	    from t_rt_road_points a,(
+	        select @rw:=0,@lng:=null,@lat:=null
+	    ) b
+	    where 1=1
+        <if test="vo.roadId!=null">
+			and a.road_id=#{vo.roadId}
+		</if>
+	    order by a.road_id,a.bd_latitude,a.bd_longitude,a.group_id asc
+	)a
+	where a.rw=1
+</select>
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+需求描述：提供定时任务执行。同时满足多个。
+一个task表示一个执行任务,多个任务多个task
+属性说明：
+  path:执行路径(全局唯一) 必填
+  modul:模块名 必填
+  execute:目标类(就是要运行的service名称) 必填
+  cron:执行计划表达式 (具体配置请参照api)必填
+  inParam:初始化参数 
+  async:异步/同步 必填
+  locale:语言
+注: execute所执行的任务service必须实现com.complaint.service.TaskService接口
+-->
+<tasks enable="true" appName="app">
+
+	<task path="trigger1" modul="system" execute="fileDeleteTaskService"  cron="0 0 2 * * ?" inParam="" async="false" locale="zh_en"/>
+
+</tasks>

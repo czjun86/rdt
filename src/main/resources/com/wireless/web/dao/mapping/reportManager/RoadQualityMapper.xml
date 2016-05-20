@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.reportManager.RoadQualityDao">
+	
+	<select id="roadAnalysis" statementType="CALLABLE"
+		parameterType="map">    
+		<![CDATA[
+			call pr_qry_mid_road_analysis(
+			#{uuid,mode=IN,jdbcType=DECIMAL},
+			#{starttime,mode=IN,jdbcType=VARCHAR},
+			#{endtime,mode=IN,jdbcType=VARCHAR},
+			#{province,mode=IN,jdbcType=VARCHAR},
+			#{district,mode=IN,jdbcType=VARCHAR},
+			#{area,mode=IN,jdbcType=VARCHAR},
+			#{roadType,mode=IN,jdbcType=DECIMAL},
+			#{roadLevel,mode=IN,jdbcType=DECIMAL},
+			#{operator,mode=IN,jdbcType=VARCHAR},
+			#{kpiId,mode=IN,jdbcType=DECIMAL},
+			#{telecoms,mode=IN,jdbcType=VARCHAR},
+			#{compare,mode=IN,jdbcType=VARCHAR},
+			#{compValue,mode=IN,jdbcType=NUMERIC},
+			#{flag,mode=OUT,jdbcType=DECIMAL}
+			)
+		]]>
+	</select>
+	
+	
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  qry_road_analysis q
+		where 1=1
+			and self_value is not null
+			and comp_value is not null
+			and q.qry_uuid = #{uuid}
+		<if test="threshold != null">
+			and if(#{compare}=1,self_value-comp_value,comp_value-self_value) &gt; ${threshold}
+		</if>
+	</select>
+	
+	<select id="queryForList" parameterType="map" resultType="map">
+		<include refid="query"/>
+		limit #{lbound},#{pageSize}
+	</select>
+	
+	<select id="exportList" parameterType="map" resultType="map">
+		<include refid="query"/>
+	</select>
+	
+	
+		<sql id="query">
+		select
+            parent_region cityName,
+            region_name countryName,
+            road_name roadName,
+            road_id roadId,
+            road_type roadType,
+            road_level roadLevel,
+            level2_code parentId,
+            region_code regionCode,
+            ifnull(road_cover_rate,'N/A') wirelessCoverage,
+            ifnull(lte_rsrp,'N/A') lteRsrp,
+            ifnull(lte_snr,'N/A') lteSnr,
+            ifnull(bw_link,'N/A') bwLink,
+            ifnull(rate_network_drop,'N/A') networkRate,
+			ifnull(rate_ping_drop,'N/A') pingRate,
+			ifnull(num_network_43,'N/A') lteToWcdma,
+            self_value selfValue,
+            comp_value compValue,
+            ifnull(if(#{compare}=1,self_value-comp_value,comp_value-self_value),'N/A') diffValue
+        from  qry_road_analysis q
+		where 1=1
+			and self_value is not null
+			and comp_value is not null
+			and q.qry_uuid = #{uuid}
+		<if test="threshold != null">
+			and if(#{compare}=1,self_value-comp_value,comp_value-self_value) &gt; ${threshold}
+		</if>
+		order by if(#{compare}=1,self_value-comp_value,comp_value-self_value) desc
+	</sql>
+	
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.epinfoManager.EpinfoDao">
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  (<include refid="query"/>) t
+	</select>
+	<select id="queryForList" parameterType="map" resultType="map">
+	select t.* from  (<include refid="query"/>) t
+		limit #{lbound},#{pageSize}
+	</select>
+	<sql id="query">
+		SELECT
+			t.*, r. NAME collectionName,
+			r.is_collect
+		FROM
+			T_RT_EP_INFO t
+		LEFT JOIN T_RT_RULE_SETTINGS r ON t.rule_name = r.name
+		LEFT JOIN t_rt_ver_settings v ON t.soft_ver = v.soft_ver
+		where 1=1
+		AND r.is_del = 0
+		AND V.is_del = 0
+		AND t.is_del = 0
+		<if test="starttime !=null and starttime != ''">
+			AND t.update_time &gt;= #{starttime}
+		</if>
+		<if test="endtime !=null and endtime != ''">
+			AND t.update_time &lt;= #{endtime}
+		</if>
+		<if test="regionCode !=null and regionCode != ''">
+			AND t.region_code LIKE #{regionCode}
+		</if>
+		<if test="operator !=null and operator != '' and operator != -1">
+			AND t.telecoms = #{operator}
+		</if>
+		<if test="imei !=null and imei != ''">
+			AND t.imei like #{imei}
+		</if>
+		<if test="model !=null and model != '' and model != '-1'">
+			AND t.term_model = #{model}
+		</if>
+		<if test="colletion !=null and colletion != '' and colletion != '-1'  and colletion != '-2'">
+			AND r.id = #{colletion}
+		</if>
+		<if test="colletion !=null and colletion != '' and colletion != '-1' and colletion == '-2'">
+			AND r.id is null
+		</if>
+		<if test="vision !=null and vision !='' and vision != '-1' and vision != '-2'">
+			AND v.id = #{vision}
+		</if>
+		<if test="vision !=null and vision !='' and vision != '-1' and vision == '-2'">
+			AND v.id is null
+		</if>
+		ORDER BY
+			t.update_time DESC,
+			t.imei DESC
+	</sql>
+	<select id="queryCollection" resultType="map">
+		select t.id,t.name value from t_rt_rule_settings t where t.is_del = 0 ORDER BY t.update_time DESC
+	</select>
+	<select id="queryModel" resultType="map">
+		select t.term_model id,t.term_model value from T_RT_EP_INFO t where t.is_del = 0 GROUP BY t.term_model ORDER BY t.update_time desc
+	</select>
+	<select id="queryVision" resultType="map">
+		select t.id id,t.soft_ver value from T_RT_VER_SETTINGS t  where t.is_del = 0 ORDER BY t.create_time desc
+	</select>
+	<select id="getEpName" parameterType="java.lang.String" resultType="java.lang.String">
+		select t.term_model id from T_RT_EP_INFO t WHERE t.term_model like #{name} GROUP BY t.term_model
+	</select>
+	<insert id="insertInfo" parameterType="map">
+		INSERT INTO `t_rt_ep_info` ( `imei`, `term_model`, `telecoms`,
+		 `soft_ver`, `rule_name`, `province`, `district`, `area`, `region_code`,
+		  `is_del`, `memo`, `update_time`, `create_time`)
+		 VALUES (#{imei},#{term_model},#{telecoms},#{soft_ver},#{rule_name},#{province},#{district},#{area},
+		 #{region_code},#{is_del},#{memo},#{update_time},#{create_time})
+	</insert>
+	<update id="updateInfo" parameterType="map">
+		UPDATE `t_rt_ep_info` SET `imei`=#{imei}, `term_model`=#{term_model}, `telecoms`=#{telecoms},
+		 `soft_ver`=#{soft_ver}, `rule_name`=#{rule_name}, `province`=#{province}, `district`=#{district}, `area`=#{area},
+		  `region_code`=#{region_code}, `memo`=#{memo}, `update_time`=#{update_time} WHERE (`id`=#{id})
+	</update>
+	<select id="checkName" parameterType="String" resultType="java.lang.Integer">
+		select t.id from t_rt_ep_info t WHERE t.imei =#{imei}
+	</select>
+	<select id="getIds" parameterType="map" resultType="java.lang.Integer">
+		select t.id from  (<include refid="query"/>) t
+	</select>
+	<update id="insertByBatch" parameterType="map">
+		UPDATE `t_rt_ep_info` SET `update_time`=#{update_time}
+		<if test="type !=null and type == 'collection'">
+		, `rule_name`=#{value} 
+		</if>
+		<if test="type !=null and type == 'vision'">
+		,`soft_ver`=#{value} 
+		</if>
+		 WHERE `id`=#{id}
+	</update>
+	<select id="queryChild" parameterType="java.lang.Integer" resultType="map">
+		select t.* from t_rt_ep_info t WHERE t.is_del = 0 AND t.id =#{id} Limit 0,1
+	</select>
+	<select id="queryAll" parameterType="map" resultType="map">
+	select 
+		CONCAT (
+			t.province,
+			'/',
+			t.district,
+			'/',
+			t.area
+		) area,
+		CASE
+			WHEN t.telecoms = '1' THEN
+				'联通'
+			WHEN t.telecoms = '2' THEN
+				'移动'
+			WHEN t.telecoms = '3' THEN
+				'电信'
+			END telecoms,
+		 t.term_model,
+		 t.imei,
+		 t.rule_name,
+		 t.soft_ver,
+		 t.update_time,
+		CASE
+			WHEN t.is_collect = 1 THEN
+				"是"
+			ELSE
+				"否"
+			END is_collect,
+		t.memo
+	 from  (<include refid="query"/>) t
+	</select>
+</mapper>

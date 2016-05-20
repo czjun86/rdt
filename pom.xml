@@ -1,0 +1,576 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.wi</groupId>
+	<artifactId>rdt</artifactId>
+	<name>rdt</name>
+	<packaging>war</packaging>
+	<version>1.0.0</version>
+	<properties>
+		<java-version>1.6</java-version>
+		<org.springframework-version>3.2.0.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.6.10</org.aspectj-version>
+		<org.slf4j-version>1.6.6</org.slf4j-version>
+		<org.codehaus.jackson-version>1.9.11</org.codehaus.jackson-version>
+		<dom4j-version>1.6.1</dom4j-version>
+		<jaxen-version>1.1.4</jaxen-version>
+		<spring-security-version>3.1.3.RELEASE</spring-security-version>
+		<org.mybatis-spring-version>1.1.1</org.mybatis-spring-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compile.deprecation>true</maven.compile.deprecation>
+		<com.oracle-version>10.2.0.4.0</com.oracle-version>
+		<freemarker-version>2.3.19</freemarker-version>
+		<commons-lang-version>2.6</commons-lang-version>
+		<axis2-version>1.6.2</axis2-version>
+		<org.hibernate-core-version>4.2.0.CR1</org.hibernate-core-version>
+		<org.apache.mina-version>2.0.7</org.apache.mina-version>
+		<com.json.simple-version>1.1.1</com.json.simple-version>
+		<spring.flex-version>1.5.2.RELEASE</spring.flex-version>
+		<blazeds-version>3.2.0.3978</blazeds-version>
+		<com.flex.messaging-version>1.0.0</com.flex.messaging-version>
+		<org.apache.tomcat-jdbc-version>1.1.0.1</org.apache.tomcat-jdbc-version>
+		<commons.io-version>1.3.2</commons.io-version>
+		<commons.net-version>3.1</commons.net-version>
+		<org.apache.poi-version>3.9</org.apache.poi-version>
+		<org.apache.poi.ooxml-version>3.9</org.apache.poi.ooxml-version>
+		<com.alibaba-version>1.1.36</com.alibaba-version>
+		<ommons-digester-version>3.2</ommons-digester-version>
+		<org.quartz-version>1.8.4</org.quartz-version>
+		<org.apache.shiro-version>1.2.2</org.apache.shiro-version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework-version}</version>
+			<exclusions>
+				<!-- Exclude Commons Logging in favor of SLF4j -->
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+		<!-- org.apache -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>${org.apache.tomcat-jdbc-version}</version>
+		</dependency>
+
+		<!-- org.apache.commons.io -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io-version}</version>
+		</dependency>
+
+		<!-- org.apache.commons.net -->
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>${commons.net-version}</version>
+		</dependency>
+
+		<!-- org.apache.poi -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${org.apache.poi-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${org.apache.poi.ooxml-version}</version>
+		</dependency>
+
+		<!-- mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>${org.mybatis-spring-version}</version>
+		</dependency>
+
+		<!-- spring security -->
+	<!-- 	<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring-security-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring-security-version}</version>
+		</dependency> -->
+
+		<!-- apache mina -->
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-core</artifactId>
+			<version>${org.apache.mina-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-integration-beans</artifactId>
+			<version>${org.apache.mina-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.mina</groupId>
+					<artifactId>mina-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- spring - json -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${org.codehaus.jackson-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${org.codehaus.jackson-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${com.alibaba-version}</version>
+		</dependency>
+		<!-- spring flex -->
+		<!-- <dependency>
+			<groupId>org.springframework.flex</groupId>
+			<artifactId>spring-flex-core</artifactId>
+			<version>${spring.flex-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.adobe.blazeds</groupId>
+					<artifactId>blazeds-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.adobe.blazeds</groupId>
+					<artifactId>blazeds-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.adobe.blazeds</groupId>
+					<artifactId>blazeds-remoting</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.adobe.blazeds</groupId>
+					<artifactId>blazeds-proxy</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe.blazeds</groupId>
+			<artifactId>blazeds-core</artifactId>
+			<version>${blazeds-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe.blazeds</groupId>
+			<artifactId>blazeds-common</artifactId>
+			<version>${blazeds-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe.blazeds</groupId>
+			<artifactId>blazeds-remoting</artifactId>
+			<version>${blazeds-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe.blazeds</groupId>
+			<artifactId>blazeds-proxy</artifactId>
+			<version>${blazeds-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe</groupId>
+			<artifactId>flex-messaging-common</artifactId>
+			<version>${com.flex.messaging-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.adobe</groupId>
+			<artifactId>flex-messaging-core</artifactId>
+			<version>${com.flex.messaging-version}</version>
+		</dependency> -->
+
+		<!-- axis2 -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-http</artifactId>
+			<version>${axis2-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-spring</artifactId>
+			<version>${axis2-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-java2wsdl</artifactId>
+			<version>${axis2-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2</artifactId>
+			<version>${axis2-version}</version>
+		</dependency>
+
+		<!-- dom4j -->
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>${dom4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>${jaxen-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>${com.oracle-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+		</dependency>
+		
+		<!-- mysql -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.34</version>
+		</dependency>
+
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-access</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<!-- json -->
+		<dependency>
+			<groupId>com.json</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>${com.json.simple-version}</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
+        </dependency>
+		
+		<dependency>
+			<groupId>com.json</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>${com.json.simple-version}</version>
+		</dependency>
+
+		<!-- freemarker -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker-version}</version>
+		</dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- commons-lang -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons-lang-version}</version>
+		</dependency>
+		<!-- commons-digester -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-digester3</artifactId>
+			<version>${ommons-digester-version}</version>
+		</dependency>
+		<!-- org.quartz-scheduler -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${org.quartz-version}</version>
+		</dependency>
+		
+		 <dependency>
+	       <groupId>org.directwebremoting</groupId>
+	       <artifactId>dwr</artifactId>
+	       <version>3.0</version>
+	       <scope>system</scope>
+	       <systemPath>${basedir}/dependLib/dwr.jar</systemPath>
+		</dependency> 
+		
+		<dependency>
+	       <groupId>cn.poweropt.rtCms.entity</groupId>
+	       <artifactId>cmsRoadEntity</artifactId>
+	       <version>1.0</version>
+	       <scope>system</scope>
+	       <systemPath>${basedir}/dependLib/cmsRoadEntity.jar</systemPath>
+		</dependency>
+		
+	<!-- 	<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-all</artifactId>
+		    <version>1.2.2</version>
+		</dependency> -->
+		
+		<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-all</artifactId>
+		    <version>${org.apache.shiro-version}</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-test</artifactId>
+	<version>3.2.0.RELEASE</version>
+</dependency>
+<dependency>
+	<groupId>p6spy</groupId>
+	<artifactId>p6spy</artifactId>
+	<version>2.1.3</version>
+</dependency>
+	<!-- elasticsearch begin -->
+	<dependency>
+		<groupId>org.elasticsearch</groupId>
+		<artifactId>elasticsearch</artifactId>
+		<version>2.1.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.spatial4j</groupId>
+	    <artifactId>spatial4j</artifactId>
+	    <version>0.4.1</version>                        
+	</dependency>
+	<dependency>
+	    <groupId>com.vividsolutions</groupId>
+	    <artifactId>jts</artifactId>
+	    <version>1.13</version>                         
+	    <exclusions>
+	        <exclusion>
+	            <groupId>xerces</groupId>
+	            <artifactId>xercesImpl</artifactId>
+	        </exclusion>
+	    </exclusions>
+	</dependency>
+	<!-- elasticsearch end -->
+	
+	<!-- memcache client begin -->
+		<dependency>
+			<groupId>com.whalin</groupId>
+			<artifactId>Memcached-Java-Client</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+	<!-- memcache client end -->
+	
+
+	</dependencies>
+	<build>
+		<finalName>rdt</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<mainClass>org.test.int1.Main</mainClass>
+				</configuration>
+			</plugin>
+			<plugin>
+		       <groupId>org.apache.maven.plugins</groupId>
+		       <artifactId>maven-war-plugin</artifactId>
+		            <configuration>
+		                <webResources>
+		                    <resource>
+		                        <directory>${project.basedir}/dependLib</directory>
+		                        <targetPath>WEB-INF/lib</targetPath>
+		                        <filtering>false</filtering>
+		                        <includes>
+		                            <include>**/*.jar</include>
+		                        </includes>
+		                    </resource>
+		                </webResources>
+		            </configuration>
+		    </plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<packagingExcludes>WEB-INF/web.xml</packagingExcludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<targetPath>${basedir}/src/main/webapp/META-INF</targetPath>
+						<directory>src/resources/context/dev</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+		<profile>
+			<id>test</id>
+			<build>
+				<resources>
+					<resource>
+						<targetPath>${basedir}/src/main/webapp/META-INF</targetPath>
+						<directory>src/resources/context/test</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<build>
+				<resources>
+					<resource>
+						<targetPath>${basedir}/src/main/webapp/META-INF</targetPath>
+						<directory>src/resources/context/prod</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+	</profiles>
+</project>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Context>	  
+        <Resource name="jdbc/oracle" 
+              auth="Container" 
+              type="javax.sql.DataSource" 
+              driverClassName="oracle.jdbc.driver.OracleDriver"
+              url="jdbc:oracle:thin:@192.168.1.161:1521:orcl"
+              username="cqwxcs" 
+              password="cqwxcs"
+              maxActive="100" 
+              minIdle="30" 
+              maxWait="10000"
+              validationQuery="select 1 from dual"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              testWhileIdle="true"
+              testOnBorrow="true"
+              testOnReturn="false"
+              validationInterval="30000"
+              timeBetweenEvictionRunsMillis="30000"
+              initialSize="30"
+              logAbandoned="true"
+              minEvictableIdleTimeMillis="30000" 
+              />
+</Context>

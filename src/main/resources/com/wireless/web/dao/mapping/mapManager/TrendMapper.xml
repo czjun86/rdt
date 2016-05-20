@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.mapManager.TrendDao">
+	<select id="queryTrend" resultType="map" parameterType="com.wireless.web.model.VoBean">
+		SELECT
+			m.cal_time time,
+			m.telecoms wifiComs,
+			<include refid="condition"/>
+			CASE
+			WHEN m.telecoms = 1 THEN
+				1
+			WHEN m.telecoms = 2 THEN
+				2
+			WHEN m.telecoms = 3 THEN
+				3
+			WHEN m.telecoms = 4 THEN
+				4
+			END wifiOrder
+		FROM
+		<!-- queryType为1查询区域 -->
+		<if test="level != null and level != '' and (level==1 or level==2 or level ==3)">
+			t_cms_region_middle m
+		</if>
+		<if test="level != null and level != '' and level==4">
+			t_cms_grid500_middle m
+		</if>
+		<if test="level != null and level != '' and level==5">
+			t_cms_grid250_middle m
+		</if>
+		WHERE 1=1
+			<include refid="param"/>
+		GROUP BY
+			m.cal_time , m.telecoms
+		order by m.cal_time asc ,wifiOrder asc 
+	</select>
+	<sql id="condition">
+			ifnull(round(sum(case when m.telecoms =1 then m.kpi_total_value else 0 end)/sum(case when m.telecoms =1 then m.kpi_total_point else 0 end),2),0) 'uni',
+			ifnull(round(sum(case when m.telecoms =2 then m.kpi_total_value else 0 end)/sum(case when m.telecoms =2 then m.kpi_total_point else 0 end),2),0) 'mob',
+			ifnull(round(sum(case when m.telecoms =3 then m.kpi_total_value else 0 end)/sum(case when m.telecoms =3 then m.kpi_total_point else 0 end),2),0) 'tel',
+			ifnull(round(sum(case when m.telecoms =4 then m.kpi_total_value else 0 end)/sum(case when m.telecoms =4 then m.kpi_total_point else 0 end),2),0) 'other',
+			ifnull(sum(case when m.telecoms =1 then m.kpi_total_point else 0 end),0) 'unicnt',
+			ifnull(sum(case when m.telecoms =2 then m.kpi_total_point else 0 end),0) 'mobcnt',
+			ifnull(sum(case when m.telecoms =3 then m.kpi_total_point else 0 end),0) 'telcnt',
+			ifnull(sum(case when m.telecoms =4 then m.kpi_total_point else 0 end),0) 'othercnt',
+	</sql>
+	<sql id="param">
+		<if test="starttime != null and starttime != '' ">
+			AND m.cal_time &gt;= #{starttime}
+		</if>
+		<if test="endtime != null and endtime != '' ">
+			AND m.cal_time &lt;= #{endtime}
+		</if>
+		<if test="regionCode != null and regionCode != '' ">
+			AND m.region_code like #{regionCode}
+		</if>
+		<if test="level != null and level != '' and (level==1 or level==2 or level ==3)">
+			AND m.region_level = #{level}
+		</if>
+		<if test="kpiType != null and kpiType != '' ">
+			AND m.kpi_type = #{kpiType}
+		</if>
+		<if test="netType != null and netType != '' ">
+			AND m.network = #{netType}
+		</if>
+		<if test="level != null and level != '' and (level==4 or level==5 )">
+			 <!--250*250的数据增加网格条件--> 
+			AND m.grid_slng = #{slng}
+			AND m.grid_nlng = #{nlng}
+			AND m.grid_slat = #{slat}
+			AND m.grid_nlat = #{nlat}
+		</if>
+	</sql>
+</mapper>

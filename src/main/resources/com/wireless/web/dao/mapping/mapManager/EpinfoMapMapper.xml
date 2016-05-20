@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.mapManager.EpinfoMapDao">
+<!-- 根据用户ID查询出对应的一级行政区域名称 -->
+	<select id="getAreaNameByUserId" parameterType="map"
+		resultType="com.wireless.web.model.Area" >
+		SELECT d.region_code id,level2_name state,
+		d.level1_name text
+		FROM
+		t_cms_region_dic d
+		WHERE
+		d.region_code = (
+		SELECT
+		u.province
+		FROM
+		t_user u where u.userid=#{userId})
+	</select>
+	<select id="getKpi"  parameterType="map"	resultType="com.wireless.web.model.KpiSettings">
+select 
+  kpi_type,
+  kpi_name,
+  range_one_start,
+  range_one_end,
+  range_one_state,
+  range_two_start,
+  range_two_end,
+  range_two_state,
+  range_three_start,
+  range_three_end,
+  range_three_state,
+  range_four_start,
+  range_four_end,
+  range_four_state,
+  range_five_start,
+  range_five_end,
+  range_five_state,
+  range_six_start,
+  range_six_end,
+  range_six_state,
+  range_one_color,
+  range_two_color,
+  range_three_color,
+  range_four_color,
+  range_five_color,
+  range_six_color,
+  shape,
+  shape_id,
+  userid,
+  telecoms from t_rt_kpi_settings where userid=#{vo.userId} and telecoms=#{vo.operator}  
+  <if test="isWarn !=null and isWarn==0">
+  and kpi_type=#{vo.kpiType} 
+  </if>
+    <if test="isWarn !=null and isWarn==1">
+ and kpi_type=#{vo.warn} 
+  </if>
+</select>
+
+	
+	<!-- 采样点调用存储过程 -->
+	  <select id="getPro" statementType="CALLABLE" parameterType="map" resultType="BigDecimal">    
+	<![CDATA[
+	call pr_qry_gis_sample_analysis(
+	#{vo.uuid,mode=IN,jdbcType=VARCHAR},
+	#{vo.userId,mode=IN,jdbcType=NUMERIC},
+	#{vo.starttime,mode=IN,jdbcType=VARCHAR}, 
+	#{vo.endtime,mode=IN,jdbcType=VARCHAR},
+	#{vo.operator,mode=IN,jdbcType=NUMERIC},
+	#{vo.kpiType,mode=IN,jdbcType=NUMERIC},
+	#{vo.kpiSymbol,mode=IN,jdbcType=NUMERIC},
+	#{vo.kpiVaule,mode=IN,jdbcType=NUMERIC},
+	#{vo.province,mode=IN,jdbcType=VARCHAR},
+	#{vo.district,mode=IN,jdbcType=VARCHAR},
+	#{vo.area,mode=IN,jdbcType=VARCHAR},
+	#{vo.roadType,mode=IN,jdbcType=NUMERIC},
+	#{vo.roadLevel,mode=IN,jdbcType=NUMERIC},
+	#{vo.roadId,mode=IN,jdbcType=VARCHAR},
+	#{rs,mode=OUT,jdbcType=NUMERIC}
+	) ]]>  
+</select>
+
+	<!-- 采样点均值存储过程--> 
+	  <select id="getProAvgPoint" statementType="CALLABLE" parameterType="map" resultType="map">    
+	<![CDATA[
+	call pr_qry_gis_box_analysis(
+	#{vo.uuid,mode=IN,jdbcType=VARCHAR},
+	#{vo.points,mode=IN,jdbcType=VARCHAR}, 
+	#{vo.kpiInterv,mode=IN,jdbcType=VARCHAR},
+	#{signalCount,mode=OUT,jdbcType=VARCHAR},
+	#{busCount,mode=OUT,jdbcType=VARCHAR},
+	#{rsrp,mode=OUT,jdbcType=VARCHAR},
+	#{rsrq,mode=OUT,jdbcType=VARCHAR},
+	#{snr,mode=OUT,jdbcType=VARCHAR},
+	#{link,mode=OUT,jdbcType=VARCHAR},
+	#{lose,mode=OUT,jdbcType=VARCHAR},
+	#{delay,mode=OUT,jdbcType=VARCHAR},
+	#{rs,mode=OUT,jdbcType=NUMERIC}
+	) ]]>    
+	</select>
+	
+	<!-- 钻取采样点集合 -->
+
+<select id="getPoint"  resultType="com.wireless.web.model.Points" parameterType="map">
+	select 
+    kpi_color state ,
+    kpi_interval inter,
+    imei,
+    latitude lat ,
+    longitude lng ,
+    lte_ci ci ,
+    pci,
+    enode_bid bid ,
+    tac,
+    CONCAT(lte_rsrp,'dBm') rsrp ,
+    CONCAT(lte_rsrq,'dB') rsrq ,
+    CONCAT(lte_snr,'dB') snr ,
+ case when bw_link=-998 or concat(bw_link,'')='N/A' then 'N/A' else CONCAT(bw_link,'Mbps') end  link,
+ case when ping_avg_delay=-998 or concat(ping_avg_delay,'')='N/A' then 'N/A' else CONCAT(ping_avg_delay,'ms') end delay,
+ case when ping_lose_rate=-998 or concat(ping_lose_rate,'')='N/A' then 'N/A' else CONCAT(ping_lose_rate,'%')  end lose,
+    date_format(test_time,'%Y-%m-%d %H:%i:%s')time
+FROM
+	qry_gis_sample_analysis d where qry_uuid=#{vo.uuid} and kpi_interval>0 order by test_time asc
+</select>
+
+<select id="getPointExcel"  parameterType="map" resultType="map">
+	select 
+    kpi_color state ,
+    kpi_interval inter,
+    imei,
+    latitude lat ,
+    longitude lng ,
+    lte_ci ci ,
+    pci,
+    enode_bid bid ,
+    tac,
+    lte_rsrp rsrp ,
+    lte_rsrq rsrq ,
+    lte_snr snr ,
+ case when bw_link=-998 or concat(bw_link,'')='N/A' then 'N/A' else bw_link end  link,
+ case when ping_avg_delay=-998 or concat(ping_avg_delay,'')='N/A' then 'N/A' else ping_avg_delay end delay,
+ case when ping_lose_rate=-998 or concat(ping_lose_rate,'')='N/A' then 'N/A' else ping_lose_rate  end lose,
+    date_format(test_time,'%Y-%m-%d %H:%i:%s')time
+FROM
+	qry_gis_sample_analysis d where qry_uuid=#{vo.uuid} and  INSTR(#{vo.kpiInterv},kpi_interval)>0  and kpi_interval>0 and 7>kpi_interval 
+	<if test="vo.points != null and vo.points != '' ">
+	and is_box=1
+	</if>
+	order by test_time desc
+</select>
+<!-- 钻取道路点集合
+
+<select id="getRoadPoint"  resultType="com.wireless.web.model.TcmsQryGridPoint">
+	select 	 phone_type,
+	  phone_num,
+	  term_model,
+longitude_offset lng,
+
+latitude_offset lat,
+	  ping_lose_rate,
+	  http_speed,
+	  ping_delay,
+	  rx_level,
+	  rscp,
+	  snr,
+	  rsrp,
+	  rsrq,
+	  sinr,
+	  cqi,
+	  imei,
+	  lac,
+	  cellid,
+	  telecoms,
+	  network,
+	  network_type,
+	  region_code,
+	  kpi_rank,
+	  date_format(mobile_time,'%Y-%m-%d %H:%m:%s')time
+FROM
+	t_cms_qry_grid_point d
+</select> -->
+</mapper>

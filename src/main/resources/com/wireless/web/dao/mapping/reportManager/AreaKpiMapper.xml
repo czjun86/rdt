@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.reportManager.AreaKpiDao">
+	
+	<select id="areaAnalysis" statementType="CALLABLE"
+		parameterType="map">    
+		<![CDATA[
+			call pr_qry_mid_area_analysis(
+			#{uuid,mode=IN,jdbcType=DECIMAL},
+			#{starttime,mode=IN,jdbcType=VARCHAR},
+			#{endtime,mode=IN,jdbcType=VARCHAR},
+			#{province,mode=IN,jdbcType=VARCHAR},
+			#{district,mode=IN,jdbcType=VARCHAR},
+			#{area,mode=IN,jdbcType=VARCHAR},
+			#{kpiId,mode=IN,jdbcType=DECIMAL},
+			#{flag,mode=OUT,jdbcType=DECIMAL}
+			)
+		]]>
+	</select>
+	
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(distinct region_code) from  qry_area_analysis q where q.qry_uuid = #{uuid}
+	</select>
+	
+	<select id="queryForList" parameterType="map" resultType="map">
+		<include refid="query"/>
+		limit #{lbound},#{pageSize}
+	</select>
+	
+	<select id="exportList" parameterType="map" resultType="map">
+		<include refid="query"/>
+	</select>
+	
+	<sql id="query">
+		select
+		    max(case when rw=1 then kpi_value end)+0 rw,
+		    parent_region cityName,
+		    region_name countryName,
+		    ifnull(max(case when rw=1 and kpi_value is not null then telecoms end),'-') telecoms1,
+		    ifnull(max(case when rw=1 then kpi_value end),'-') kpiValue1,
+		    ifnull(max(case when rw=2 and kpi_value is not null then telecoms end),'-') telecoms2,
+		    ifnull(max(case when rw=2 then kpi_value end),'-') kpiValue2,
+		    ifnull(max(case when rw=3 and kpi_value is not null then telecoms end),'-') telecoms3,
+		    ifnull(max(case when rw=3 then kpi_value end),'-') kpiValue3
+		from(
+		    select
+		        a.parent_region,
+		        a.region_name,
+		        case a.telecoms when 1 then '联通' when 2 then '移动' when 3 then '电信' end telecoms,
+		        a.region_code,
+		        format(a.kpi_value,2) kpi_value,
+		        if(@region_code=a.region_code,@rw:=@rw+1,@rw:=1) rw,
+		        @region_code:=a.region_code x
+		    from(
+		        select
+		            parent_region,
+		            region_name,
+		            telecoms,
+		            region_code,
+		            case #{kpiId} when 8 then road_cover_rate when 1 then lte_rsrp when 2 then lte_snr when 4 then bw_link when 9 then rate_network_drop when 10 then rate_ping_drop end kpi_value
+		        from qry_area_analysis q
+		        where 1=1
+		            and q.qry_uuid = #{uuid}
+		        order by region_code,kpi_value desc
+		    )a,(
+		        select @rw:=0,@region_code:=null
+		    )b
+		)a
+		group by
+		    parent_region,
+		    region_name
+		order by 1 desc
+	</sql>
+	
+	
+	<!-- 原有query 
+	<sql id="query">
+        select
+            max(case when rw=1 then kpi_value end)+0 rw,
+            parent_region cityName,
+            region_name countryName,
+            ifnull(max(case when rw=1 then telecoms end),'N/A') telecoms1,
+            ifnull(max(case when rw=1 then kpi_value end),'N/A') kpiValue1,
+            ifnull(max(case when rw=2 then telecoms end),'N/A') telecoms2,
+            ifnull(max(case when rw=2 then kpi_value end),'N/A') kpiValue2,
+            ifnull(max(case when rw=3 then telecoms end),'N/A') telecoms3,
+            ifnull(max(case when rw=3 then kpi_value end),'N/A') kpiValue3
+        from(
+            select
+                a.region_code,
+                if((b.level2_name like '%市辖区%'),b.level1_name,b.region_name) parent_region,
+                b.region_name region_name,
+                case a.telecoms when 1 then '联通' when 2 then '移动' when 3 then '电信' else 'N/A' end telecoms,
+                a.kpi_value,
+                if(@region_code=a.region_code,@rw:=@rw+1,@rw:=1) rw,
+                @region_code:=a.region_code x
+            from(
+                select
+                    region_code,
+                    telecoms,
+                    case when #{kpiId}=8 then round(sum(if((lte_rsrp&gt;=-105 and lte_snr&gt;=-3),1,0))/count(*)*100,2)
+                         when #{kpiId}=1 then round(avg(lte_rsrp),2)
+                         when #{kpiId}=2 then round(avg(lte_snr),2)
+                         when #{kpiId}=4 then round(avg(if(bw_link=-998,null,bw_link))/1024,2)
+                         end x,
+                    case when #{kpiId}=8 then concat(round(sum(if((lte_rsrp&gt;=-105 and lte_snr&gt;=-3),1,0))/count(*)*100,2),'')
+                         when #{kpiId}=1 then concat(round(avg(lte_rsrp),2),'')
+                         when #{kpiId}=2 then concat(round(avg(lte_snr),2),'')
+                         when #{kpiId}=4 then concat(round(avg(if(bw_link=-998,null,bw_link))/1024,2),'')
+                         end kpi_value
+                from(
+                    select
+                        point_code,
+                        region_code,
+                        telecoms,
+                        round(avg(lte_rsrp),2) lte_rsrp,
+                        round(avg(lte_rsrq)) lte_rsrq,
+                        round(avg(lte_snr),2) lte_snr,
+                        round(avg(if(bw_link=-998,null,bw_link)),2) bw_link
+                    from t_rt_4g_collect
+                    where 1=1
+                        and (point_code is not null and point_code &lt;&gt; '')
+                        and -998!=(case when #{kpiId}=4 then bw_link
+                                        else 998 end)
+                        and test_time &gt;= str_to_date(concat(#{starttime},'00:00:00'),'%Y-%m-%d %H:%i:%s')
+                        and test_time &lt;= str_to_date(concat(#{endtime},'23:59:59'),'%Y-%m-%d %H:%i:%s')
+                        and telecoms in (1,2,3)
+                        and region_code in(
+                            select region_code
+                            from t_cms_region_dic
+                            where 1=1
+                                and level=3
+                                and parent_id like concat(substr(#{province},1,2),'%')
+                                and parent_id=if(#{district}=-1,parent_id,#{district})
+                                and region_code=if(#{area}=-1,region_code,#{area})
+                        )
+                    group by
+                        point_code,
+                        region_code,
+                        telecoms
+                )a
+                group by region_code,
+                         telecoms
+                order by 1,3 desc
+            )a,t_cms_region_dic b,(
+                select @rw:=0,@region_code:=null
+            )c
+            where 1=1
+                and a.region_code=b.region_code
+        )a
+        group by parent_region,
+                 region_name
+        order by 1 desc
+	</sql>
+	-->
+	
+</mapper>

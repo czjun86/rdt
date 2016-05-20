@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.kpiManager.KpiSetDao">
+	<select id="queryKpi" parameterType="map" resultType="map">
+		SELECT
+			a.*
+		FROM
+			(SELECT
+				*
+			FROM
+				t_rt_kpi_settings
+			WHERE
+				1 = 1
+			AND userid = #{id}
+			AND telecoms = #{operator}
+			AND kpi_type = #{kpiType}
+			UNION ALL
+				SELECT
+					*
+				FROM
+					t_rt_kpi_settings a
+				WHERE
+					1 = 1
+				AND userid = 0
+				AND kpi_type = #{kpiType}
+				AND telecoms = #{operator}
+				AND NOT EXISTS (
+					SELECT
+						1
+					FROM
+						(
+							SELECT
+								*
+							FROM
+								t_rt_kpi_settings
+							WHERE
+								userid = #{id}
+						) b
+					WHERE
+						1 = 1
+					AND a.kpi_type = b.kpi_type
+					AND a.telecoms = b.telecoms
+				)
+			) a limit 0,1
+	</select>
+	<select id="myKpi" parameterType="map" resultType="map">
+		SELECT
+			*
+		FROM
+			t_rt_kpi_settings
+		WHERE
+			1 = 1
+		AND userid = #{id}
+		AND telecoms = #{operator}
+		AND kpi_type = #{kpiType}
+	</select>
+	
+	<!-- 获取所有区间设置 -->
+	<select id="getAllKpi"  parameterType="map"	resultType="com.wireless.web.model.KpiSettings">
+		select
+		    kpi_type,
+		    kpi_name,
+		    range_one_start,
+		    range_one_end,
+		    range_one_state,
+		    range_two_start,
+		    range_two_end,
+		    range_two_state,
+		    range_three_start,
+		    range_three_end,
+		    range_three_state,
+		    range_four_start,
+		    range_four_end,
+		    range_four_state,
+		    range_five_start,
+		    range_five_end,
+		    range_five_state,
+		    range_six_start,
+		    range_six_end,
+		    range_six_state,
+		    range_one_color,
+		    range_two_color,
+		    range_three_color,
+		    range_four_color,
+		    range_five_color,
+		    range_six_color,
+		    shape,
+		    shape_id,
+		    userid,
+		    telecoms
+		from(
+		select
+		    if(@kpi_type=a.kpi_type,@rw:=@rw+1,@rw:=1) rw,
+		    @kpi_type:=kpi_type x,
+		    a.*
+		from t_rt_kpi_settings a,(
+		    select @kpi_type:=null,@rw:=1
+		)b
+		where 1=1
+		    and a.userid in(0,#{id})
+		    and a.telecoms=#{operator}
+		order by a.kpi_type asc,a.userid desc,modify_time desc
+		)a
+		where a.rw=1 order by a.kpi_type asc
+	 </select>
+	 <insert id="insertKpi" parameterType="map">
+   		INSERT INTO t_rt_kpi_settings (
+			kpi_type,
+			kpi_name,
+			range_one_start,
+			range_one_end,
+			range_one_state,
+			range_two_start,
+			range_two_end,
+			range_two_state,
+			range_three_start,
+			range_three_end,
+			range_three_state,
+			range_four_start,
+			range_four_end,
+			range_four_state,
+			range_five_start,
+			range_five_end,
+			range_five_state,
+			range_six_start,
+			range_six_end,
+			range_six_state,
+			range_one_color,
+			range_two_color,
+			range_three_color,
+			range_four_color,
+			range_five_color,
+			range_six_color,
+			shape,
+			shape_id,
+			userid,
+			telecoms,
+			modify_time,
+			create_time
+		)
+		VALUES
+			(
+				#{kpi_type},
+				#{kpi_name},
+				#{range_one_start},
+				#{range_one_end},
+				#{range_one_state},
+				#{range_two_start},
+				#{range_two_end},
+				#{range_two_state},
+				#{range_three_start},
+				#{range_three_end},
+				#{range_three_state},
+				#{range_four_start},
+				#{range_four_end},
+				#{range_four_state},
+				#{range_five_start},
+				#{range_five_end},
+				#{range_five_state},
+				#{range_six_start},
+				#{range_six_end},
+				#{range_six_state},
+				#{range_one_color},
+				#{range_two_color},
+				#{range_three_color},
+				#{range_four_color},
+				#{range_five_color},
+				#{range_six_color},
+				#{shape},
+				#{shape_id},
+				#{userid},
+				#{telecoms},
+				#{modify_time},
+				#{create_time}
+			)
+   </insert>
+   
+   <update id="updateKpi" parameterType="map">
+   		UPDATE t_rt_kpi_settings
+			SET 
+			 range_one_start = #{range_one_start},
+			 range_one_end = #{range_one_end},
+			 range_one_state = #{range_one_state},
+			 range_two_start = #{range_two_start},
+			 range_two_end = #{range_two_end},
+			 range_two_state = #{range_two_state},
+			 range_three_start = #{range_three_start},
+			 range_three_end = #{range_three_end},
+			 range_three_state = #{range_three_state},
+			 range_four_start = #{range_four_start},
+			 range_four_end = #{range_four_end},
+			 range_four_state = #{range_four_state},
+			 range_five_start = #{range_five_start},
+			 range_five_end = #{range_five_end},
+			 range_five_state = #{range_five_state},
+			 range_six_start = #{range_six_start},
+			 range_six_end = #{range_six_end},
+			 range_six_state = #{range_six_state},
+			 range_one_color = #{range_one_color},
+			 range_two_color = #{range_two_color},
+			 range_three_color = #{range_three_color},
+			 range_four_color = #{range_four_color},
+			 range_five_color = #{range_five_color},
+			 range_six_color = #{range_six_color},
+			 shape = #{shape},
+			 shape_id = #{shape_id},
+			 modify_time = #{modify_time}
+			WHERE
+				userid = #{userid}
+			and telecoms = #{telecoms}
+			and kpi_type = #{kpi_type}
+	</update>
+</mapper>

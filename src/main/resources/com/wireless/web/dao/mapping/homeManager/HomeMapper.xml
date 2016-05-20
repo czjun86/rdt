@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.homePage.HomeDao">
+	<select id="getRegion" resultType="map" parameterType="map">
+	select u.operator,u.province,u.district,u.county from t_user u where u.userid = #{userid}
+	</select>
+
+	<!-- 查询采样点数据 -->
+	<select id="queryPointInfo" resultType="map" parameterType="map">
+		select
+			point_signal pointSignal,
+			point_business pointBusiness,
+			format(test_mileage,2) testMileage,
+			format(test_coverage,2) testCoverage,
+			format(test_coverage_main,2) testCoverageMain,
+			format(lte_rsrp,2) lteRsrp,
+			format(lte_snr,2) lteSnr,
+			format(bw_link,2) bwLink,
+			format(network_rate,2) networkRate,
+			format(ping_rate,2) pingRate
+		from rpt_homepage_kpi
+		where 1=1
+			and telecoms = #{telecoms}
+			and cal_time = #{time}
+			and region_auth = #{regionCode}
+	</select>
+	
+	<!-- 查询覆盖数据 -->
+	<select id="queryCoverInfo" resultType="map" parameterType="map">
+		select
+			rank_poor rankPoor,
+			parent_region cityName,
+			location_name contryName,
+			road_name roadName,
+			format(road_cover_rate,2) coverRate,
+			format(lte_rsrp,2) rsrp,
+			format(lte_snr,2) snr
+		from rpt_homepage_coverage
+		where 1=1
+			and telecoms = #{telecoms}
+			and cal_time = #{time}
+			and region_auth = #{regionCode}
+		order by rank_poor
+	</select>
+
+	<!-- 查询对应指标趋势 -->
+	<select id="queryCoverRate" resultType="map" parameterType="map">
+		select
+			cal_time time,
+			telecoms telecoms,
+			format(case when #{quota} = 'wireless'  then road_cover_rate
+			     when #{quota} = 'broadband' then bw_link
+			     when #{quota} = 'networkRate' then network_rate
+			     when #{quota} = 'pingRate' then ping_rate
+			     end,2) value
+		from rpt_homepage_kpi
+		where 1=1
+			and cal_time &gt;= #{starttime}
+			and cal_time &lt;= #{endtime}
+			and region_auth = #{regionCode}
+		order by cal_time asc
+	</select>
+
+	<!-- 查询指标占比 -->
+	<select id="queryQuotaProportion" resultType="map" parameterType="map">
+	    select
+	        format(rsrp_range1,2) rsrp_range_one,
+	        format(rsrp_range2,2) rsrp_range_two,
+	        format(rsrp_range3,2) rsrp_range_three,
+	        format(rsrp_range4,2) rsrp_range_four,
+	        format(rsrp_range5,2) rsrp_range_five,
+	        format(rsrp_range6,2) rsrp_range_six,
+	        format(snr_range1,2) snr_range_one,
+	        format(snr_range2,2) snr_range_two,
+	        format(snr_range3,2) snr_range_three,
+	        format(snr_range4,2) snr_range_four,
+	        format(snr_range5,2) snr_range_five,
+	        format(snr_range6,2) snr_range_six,
+		    format(rsrp_ratio1,2) rsrp1,
+		    format(rsrp_ratio2,2) rsrp2,
+		    format(rsrp_ratio3,2) rsrp3,
+		    format(rsrp_ratio4,2) rsrp4,
+		    format(rsrp_ratio5,2) rsrp5,
+		    format(rsrp_ratio6,2) rsrp6,
+		    format(snr_ratio1,2) snr1,
+		    format(snr_ratio2,2) snr2,
+		    format(snr_ratio3,2) snr3,
+		    format(snr_ratio4,2) snr4,
+		    format(snr_ratio5,2) snr5,
+		    format(snr_ratio6,2) snr6
+	    from rpt_homepage_kpi
+	    where 1=1
+	        and telecoms = #{telecoms}
+	        and cal_time = #{time}
+	        and region_auth = #{regionCode}
+	</select>
+</mapper>

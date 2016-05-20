@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Context>
+	<Resource name="jdbc/mysqldb" 
+			  auth="Container"
+     		  type="javax.sql.DataSource" 
+     		  driverClassName="com.mysql.jdbc.Driver"
+     		  url="jdbc:mysql://192.168.1.20:33333/rtcms_dev?useunicode=true&amp;characterEncoding=UTF-8"
+     		  username="root" 
+     		  password="!QAZ2wsxuio890"
+     		  maxActive="100" 
+     		  maxIdle="10"
+     		  validationQuery="select 1 from dual"
+     		  maxWait="12000"
+     		  factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              testWhileIdle="true"
+              testOnBorrow="true"
+              testOnReturn="false"
+              validationInterval="30000"
+              timeBetweenEvictionRunsMillis="30000"
+              initialSize="10"
+              logAbandoned="true"
+              minEvictableIdleTimeMillis="30000" />
+</Context>

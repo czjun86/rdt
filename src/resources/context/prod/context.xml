@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Context>
+	<Resource name="jdbc/mysql" 
+			  auth="Container"
+     		  type="javax.sql.DataSource" 
+     		  driverClassName="com.mysql.jdbc.Driver"
+     		  url="jdbc:oracle:thin:@192.168.1.161:1521:orcl"
+     		  username="root" 
+     		  password="123" 
+     		  maxActive="100" 
+     		  maxIdle="30"
+     		  validationQuery="select 1 from dual"
+     		  maxWait="12000"/>
+</Context>

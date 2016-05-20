@@ -1,0 +1,48 @@
+#chartMenu
+  {
+      background-color:#f0f0f0;  
+      border:1px solid #979797;  
+      position:absolute;  
+      width:120px;  
+      height:auto;  
+      display:none;  
+      text-align:left; 
+      opacity:0.8;
+      padding:0px;  
+      color:#000000;
+  }
+  #chartMenu div
+  {
+      border-bottom:1px solid #d7d7d7;  
+      height:25px;  
+      padding:5px;  
+      margin:1px; 
+  }
+  #charMenu_title
+  {
+      border-bottom:1px solid #d7d7d7;  
+      height:25px;  
+      padding:5px;  
+      margin:1px; 
+  }
+  
+  #chartMenu a, a:link,a:active,a:visited
+  {
+      color:#000000;
+      text-decoration:none;
+  }
+  #chartMenu div:hover
+  {
+      background:#d1e2f2; 
+      border:1px solid #78aee5;  
+  }
+  #chartMenu hr
+  {
+     border-style: solid none;
+     border-width: 1px 0;
+     border-color: #d7d7d7;
+     margin: 0;  
+  }
+  
+  
+  

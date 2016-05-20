@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.mapManager.ReplenishRoadPointsDao">
+<!-- 根据用户ID查询出对应的一级行政区域名称 -->
+	<select id="getAreaNameByUserId" parameterType="map"
+		resultType="com.wireless.web.model.Area" >
+		SELECT d.region_code id,level2_name state,
+		d.level1_name text
+		FROM
+		t_cms_region_dic d
+		WHERE
+		d.region_code = (
+		SELECT
+		u.province
+		FROM
+		t_user u where u.userid=#{userId})
+	</select>
+	
+
+	
+<!-- 钻取采样点集合 -->
+<select id="getPoint"  resultType="com.wireless.web.model.ReplenishRoadPoionts" parameterType="map">
+	SELECT
+	distinct
+	t1.uuid uuid,
+	t1.road_id roadId,
+	t1.road_name roadName,
+	t1.bd_latitude bdLatitude,
+	t1.bd_longitude bdLongitude,
+	t1.is_replenish isReplenish
+    FROM
+	t_rt_road_points t1,
+	(
+		SELECT
+			r1.road_id
+		FROM
+			t_rt_road_info r1,
+			t_rt_region_road r2
+		WHERE
+			r1.road_id = r2.road_id
+	  <if test="roadId != null and roadId != '' and roadId !='-1'">
+      AND r1.road_id = #{roadId}
+      </if>
+      <if test="roadType != null and roadType != '' and roadType !=-1">
+      AND r1.type = #{roadType}
+      </if>
+      <if test="roadLevel != null and roadLevel != '' and roadLevel != -1">
+      AND r1.level = #{roadLevel}
+      </if>
+      <if test="regCode != null and regCode != '' and regCode!=-1">
+      AND r2.region_code like concat(#{regCode},'%')
+      </if>
+	) t2
+WHERE
+	t1.road_id = t2.road_id
+</select>
+
+<!-- 保存标记点 -->
+<insert id="saveMarks" parameterType="map">
+	INSERT INTO t_rt_road_points 
+	(uuid,road_id, road_name, gd_longitude, gd_latitude, bd_longitude, bd_latitude, is_replenish, create_time) 
+	VALUES (#{uuid}, #{road_id},#{road_name}, #{gd_longitude}, #{gd_latitude}, #{bd_longitude}, #{bd_latitude}, 1 , now())
+</insert>
+
+
+<!-- 根据道路编号获取道路信息 -->
+<select id="getRoadInfoByRoadId"  resultType="cn.poweropt.rtCms.entity.RoadInfo" parameterType="java.lang.String">
+	SELECT
+	t1.road_id roadId,
+	t1.road_name roadName,
+	t1.bridge_name bridgeName,
+	t1.tunnel_name tunnelName,
+	t1.type type,
+	t1.feature feature,
+	t1.level level,
+	t1.amap_type amapType
+    FROM
+	t_rt_road_info t1
+		WHERE
+		t1.road_id = #{roadId}
+</select>
+
+
+<!-- 根据道路编号获取道路点 -->
+<select id="getPointsByRoadId"  resultType="cn.poweropt.rtCms.entity.RoadPoint" parameterType="java.lang.String">
+	SELECT
+	t1.uuid uuid,
+	t1.road_id roadId,
+	t1.road_name roadName,
+	t1.bd_latitude bdLat,
+	t1.bd_longitude bdLng,
+	t1.gd_latitude gdLat,
+	t1.gd_longitude gdLng,
+	t1.group_id groupId,
+	t1.group_offset groupOffset,
+	t1.is_overlap isOverlap
+    FROM
+	t_rt_road_points t1
+		WHERE
+		t1.road_id = #{roadId}
+</select>
+
+<!-- 删除道路点  -->
+<delete id="removePoint" parameterType="map">
+	delete from t_rt_road_points where road_id = #{roadId} and uuid = #{uuid}
+</delete>
+
+</mapper>

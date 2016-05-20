@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.VersionManager.VersionDao">
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from  (<include refid="query"/>) t
+	</select>
+	<select id="queryForList" parameterType="map" resultType="map">
+	select t.* from  (<include refid="query"/>) t
+		limit #{lbound},#{pageSize}
+	</select>
+	<sql id="query">
+		SELECT
+			t.id,
+			t.soft_ver,
+			t.`desc`,
+			t.flie_md5,
+			t.path,
+			t.is_del,
+			t.create_time
+		FROM
+			t_rt_ver_settings t
+		WHERE 1=1
+			AND t.is_del=0
+		<if test="name != null">
+			AND t.soft_ver like #{name}
+		</if>
+		<if test="starttime != null and starttime != '' ">
+			AND t.create_time &gt;= #{starttime}
+		</if>
+		<if test="endtime != null and endtime != '' ">
+			AND t.create_time &lt;= #{endtime}
+		</if>
+		ORDER BY t.create_time DESC
+	</sql>
+	<select id="hasUsed" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT
+			count(1)
+		FROM
+			t_rt_ver_settings t ,
+			t_rt_ep_info e
+		WHERE 1=1
+			AND t.is_del=0
+			AND t.id = #{id}
+			AND t.soft_ver = e.soft_ver
+	</select>
+	<update id="delete" parameterType="java.lang.Integer">
+		UPDATE t_rt_ver_settings SET is_del = 1 WHERE `id`=#{id};
+	</update>
+	<select id="queryVersion" parameterType="java.lang.Integer" resultType="map">
+		select t.* from t_rt_ver_settings t where t.id= #{id} and t.is_del=0 
+	</select>
+	<select id="checkName" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select t.id from t_rt_ver_settings t where t.soft_ver= #{name} and t.is_del=0 
+	</select>
+	<select id="saveInfo" parameterType="map" >
+	INSERT INTO t_rt_ver_settings (soft_ver, `desc`, flie_md5, path, is_del, create_time)
+	 VALUES (#{soft_ver}, #{desc}, #{flie_md5}, #{path}, #{is_del}, #{create_time});
+	</select>
+	
+</mapper>

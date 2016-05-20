@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+	<!-- <beans:bean id="EnvironmentFilter" class="com.wireless.web.filter.EnvironmentFilter"></beans:bean> -->
+
+	<beans:bean id="shiroFilter"
+		class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<beans:property name="securityManager" ref="appSecurityManager"></beans:property>
+		<beans:property name="loginUrl" value="login"></beans:property>
+		<beans:property name="filters">
+			<beans:map>
+				<beans:entry key="authc" value-ref="appShiroFilter"></beans:entry>
+			</beans:map>
+		</beans:property>
+
+		<beans:property name="filterChainDefinitions">
+			<beans:value>
+				/home/** = authc
+				/map/** = authc
+				/roadMap/** = authc
+				/replenishrps/** = authc
+				/playBack/** = authc
+				/epinfoMap/** = authc
+				/compreQuota/** = authc
+				/taskReport/** = authc
+				/areaKpiTop/** = authc
+				/roadQuality/** = authc
+				/kpiSet/** = authc
+				/operator/** = authc
+				/group/** = authc
+				/export/** = authc
+				/collection/** = authc
+				/epinfo/** = authc
+				/version/** = authc
+				/epinfoAnalysis/** = authc
+				/** = anon
+			</beans:value>
+		</beans:property>
+
+	</beans:bean>
+
+	<beans:bean id="appShiroFilter" class="com.wireless.web.shiro.CustomAuthFilter">
+	</beans:bean>
+
+	<beans:bean id="appSecurityManager"
+		class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<beans:property name="realm" ref="appRealm" />
+	</beans:bean>
+
+	<beans:bean id="lifecycleBeanPostProcessor"
+		class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<beans:bean id="appRealm" class="com.wireless.web.shiro.CustomRealm"></beans:bean>
+
+</beans:beans>

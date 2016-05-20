@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.userManager.UserMapper">
+	<select id="queryUserByUsername" parameterType="java.lang.String"
+		resultType="com.wireless.web.model.User">
+		select
+		u.userid,u.username,u.password,u.name,u.email,u.phone
+		from t_user u
+		where u.username = #{username,jdbcType=VARCHAR} and
+		u.password=#{password,jdbcType=VARCHAR}
+		and u.isActive = 1
+	</select>
+
+	<select id="loginValidate" statementType="CALLABLE"
+		parameterType="map">    
+		<![CDATA[
+			call pro_loginVaildate(
+			#{i_username,mode=IN,jdbcType=VARCHAR},
+			#{i_password,mode=IN,jdbcType=VARCHAR},
+			#{o_result,mode=OUT,jdbcType=DECIMAL},
+			#{o_userid,mode=OUT,jdbcType=DECIMAL}
+			)
+		]]>
+	</select>
+
+	<select id="queryRoleByUserId" resultType="com.wireless.web.model.Role"
+		parameterType="map">
+		select roleid, rolename
+		from t_role a
+		where a.roleid in
+		(select roleid from t_user_role b where b.userid =
+		#{userid,jdbcType=DECIMAL})
+		and a.isActive = 1
+	</select>
+
+	<select id="queryRightByRoleId" resultType="com.wireless.web.model.Right"
+		parameterType="map">
+		select rightid,rightname,url,parentid,type,orderby,showtype,skins,operate,modules,memo
+		from t_right a
+		where a.rightid in(select rightid from t_role_right b
+		where
+		<if test="size == -1">
+			b.roleid = -1
+		</if>
+		<if test="size > 0">
+			b.roleid IN
+			<foreach item="item" collection="roleList" open="("
+				separator="," close=")">
+				#{item.roleid}
+			</foreach>
+		</if>
+		) order by orderby
+	</select>
+	
+	<!-- 用户管理 开始 -->
+	<sql id="whereCondition">
+		select u.*,r.roleid,rolename from
+			(
+				SELECT
+					userid,
+					username,
+					NAME,
+					password,
+					email,
+					phone,
+					islock,
+					operator,
+					province,
+					district,
+					county,
+					tele_auth teleAuth
+				FROM
+					t_user a
+				WHERE
+					1 = 1
+				<if test="username != null">
+			  		and username = #{username}
+			  	</if>
+			  	<if test="email != null">
+			  		and email = #{email}
+			  	</if>
+			  	<if test="userId != null">
+			  		and userid = #{userId}
+			  	</if>
+			  	<if test="size != null and size != 0">  
+			        and userid IN  
+			        <foreach item="item" collection="userList" open="(" separator="," close=")">  
+			           #{item.userid}  
+			        </foreach>   
+			    </if>  
+			    	and isActive = 1
+			) u,
+			 (
+				SELECT
+					ur.userid,
+					r.*
+				FROM
+					t_user_role ur,
+					t_role r
+				WHERE
+					ur.roleid = r.roleid
+					AND r.isActive = 1
+			) r
+			WHERE
+				u.userid = r.userid
+    </sql>
+
+    <select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(b.userid)
+  			from (<include refid="whereCondition"/> ) b
+	</select>
+
+ <select id="queryForList" parameterType="map" resultType="com.wireless.web.model.User">
+   <![CDATA[
+	   select a.*
+		          from (
+	 ]]>
+		<include refid="whereCondition"/>	         
+    <![CDATA[
+		   ) a
+		       limit #{lbound},#{pageSize} 
+	]]>
+   </select>
+
+   <select id="queryUserById" parameterType="map" resultType="com.wireless.web.model.User">
+	  <include refid="whereCondition"/>
+   </select>
+   
+   <insert id="addUser">
+   		insert into t_user (username,name,password,email,phone,islock,operator,province,district,county,isActive,create_date,modify_date,tele_auth) 
+   			values(#{userName,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},
+   			#{phone,jdbcType=VARCHAR},#{islock,jdbcType=DECIMAL},#{operator},#{province,jdbcType=DECIMAL}
+   			,#{district,jdbcType=DECIMAL},#{county,jdbcType=DECIMAL} , 1 ,#{create_date},#{modify_date},
+   			#{teleAuth})
+   </insert>
+   <insert id="addUserRole">
+   		insert into t_user_role (userid, roleid) 
+   			values ((select userid from t_user where username = #{userName,jdbcType=VARCHAR} and isActive = 1 limit 0,1),#{roleid,jdbcType=DECIMAL})
+   </insert>
+   
+   <update id="updUser">
+   		update t_user set username = #{userName,jdbcType=VARCHAR},name = #{name,jdbcType=VARCHAR},
+   			email = #{email,jdbcType=VARCHAR},phone = #{phone,jdbcType=VARCHAR},islock = #{islock,jdbcType=DECIMAL},
+   			operator = #{operator} ,province = #{province,jdbcType=DECIMAL},district = #{district,jdbcType=DECIMAL},
+   			county = #{county,jdbcType=DECIMAL},modify_date = #{modify_date},tele_auth = #{teleAuth}
+   			where userid = #{userid,jdbcType=DECIMAL}
+   </update>
+   
+   <update id="updUserRole">
+   		update t_user_role set roleid = #{roleid,jdbcType=DECIMAL}
+   			where userid = #{userid,jdbcType=DECIMAL}
+   </update>
+   
+   <update id="changeUserState">
+   		update t_user set islock = #{islock,jdbcType=DECIMAL},modify_date = #{modify_date}
+   			where userid = #{userId,jdbcType=DECIMAL}
+   </update>
+   
+   <select id="checkUserName" parameterType="map" resultType="java.lang.Integer">
+	  select count(1) re from t_user a
+		         where userName = #{userName}
+		         <if test="userId != null">
+		         	and userId != #{userId}
+		         </if>
+		         	and isActive = 1
+   </select>
+   
+   <select id="checkOldPwd" parameterType="map" resultType="java.lang.Integer">
+	  select count(1) re from t_user a
+		         where userId = #{userId}
+		           and password != #{password}
+   </select>
+   
+   <update id="modfiyPassword">
+   		update t_user set password = #{password,jdbcType=VARCHAR}
+   			where userid = #{userId,jdbcType=DECIMAL}
+   </update>
+   
+   <!-- 用户管理 结束-->
+   
+   <!-- 查询用户组 -->
+   <select id="queryGroups" resultType="map">
+	  select a.roleid id,a.rolename text from t_role a
+		         where a.isActive = 1
+   </select>
+   <!-- 物理删除用户 -->
+   <update id="deleteUser" parameterType="map">
+   		update t_user set isActive = 0 ,modify_date = #{modify_date}
+   			where userid = #{userid,jdbcType=DECIMAL}
+   </update>
+   
+   <select id="hasMenu" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	  SELECT
+			count(1)
+		FROM
+			(
+				SELECT
+					ur.roleid
+				FROM
+					t_user u,
+					t_user_role ur
+				WHERE
+					ur.userid = u.userid
+				AND u.isActive = 1
+				AND u.userid = #{userid}
+			) u,
+			t_role r,
+			t_role_right rr,
+			t_right t
+		WHERE
+			r.roleid = rr.roleid
+		AND r.roleid = u.roleid
+		AND t.rightid = rr.rightid
+		AND r.isActive = 1
+   </select>
+</mapper>

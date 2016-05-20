@@ -1,0 +1,201 @@
+<div class="" style="width: 20%; line-height: 33px; float: left;">
+	<div id="<%=configs['displayContainer']%>_info" class="dataTables_info">第<%=currPage%>/<%=totalPage%>页</div>
+</div>
+<div class="pageNumber">
+	<div class="" style="float: right;">
+		<ul style="visibility: visible; margin: 10px 0; float: left;"
+			class="pageContainer">
+			<li class="prev <%if(currPage==1){%>disabled<%}%>">
+			 <a	href="javascript:void(0);" title="上一页">
+			 	<i class="fa fa-angle-left"></i>
+			 </a>
+			</li> 
+			<!--
+			<li class="firstPage">
+			 <a	href="javascript:void(0);" page="1" title="首页">
+			 	首页
+			 </a>
+			</li> 
+			-->
+			<%
+			for(var i=start; i<=end; i++){
+			if(currPage == i){%>
+			    <li><a class="a-selected" page="<%=i%>" href="javascript:void(0);"><%=i%></a></li> 
+			<%}else{%>
+			   <li><a page="<%=i%>" href="javascript:void(0);"><%=i%></a></li> 
+			<%} 
+			}%>
+			<!--
+	        <li class="lastPage">
+			 <a	href="javascript:void(0);" page="<%=totalPage%>" title="末页">
+			 	末页
+			 </a>
+			</li> 
+			-->
+			<li class="next <%if(currPage==totalPage){%>disabled<%}%>">
+			   <a href="javascript:void(0);" title="下一页">
+			      <i class="fa fa-angle-right"></i>
+			   </a>
+			</li>		
+		</ul>
+		<div
+			style='margin-top: 9px; margin-left: 9px; inline-block; line-height: 33px; float: left;'>
+			
+			GO 
+			<input type="text" class="goto" style="width:50px;height:30px;margin-bottom: 15px;"/> 
+			 页 &nbsp;每页 
+			<input type="text" class="go" style="width:50px;height:30px;margin-bottom: 15px;"/> 
+			条
+			
+		</div>
+	</div>
+	<script>
+		(function() {
+		    
+			function prev(li) {
+				li.click(function() {
+					if (!li.hasClass('disabled')) {
+						var ul = $(this).parent("ul");
+						var active = ul.find(".a-selected");
+						active.parent("li").prev().click();
+					}
+				});
+			}
+
+			function next(li) {
+				li.click(function() {
+					if (!li.hasClass('disabled')) {
+						var ul = $(this).parent("ul");
+						var active = ul.find("a.a-selected");
+						active.parent("li").next().click();
+					}
+				});
+			}
+			
+			
+			function firstPage(li){
+				li.click(function(){
+				   var ul = $(this).parent("ul");
+				   ul.find("li.disabled").removeClass("disabled");
+				   li.find("a").addClass("a-selected");
+				   var pageIndex = li.find("a").attr("page");
+				   var formid = "<%=configs['form']%>";
+				   var form = $("#" + formid);
+				   var ipageIndex = form.find("input[name='pageIndex']");
+				   ipageIndex.val(pageIndex);
+				   formSubmit();				   
+				});
+			}
+
+			function number(li) {
+				li.click(function() {
+					var ul = $(this).parent("ul");
+					li.siblings().find("a").removeClass("a-selected");
+					li.find("a").addClass("a-selected");
+					var pageIndex = li.find("a").attr("page");
+					if (pageIndex == 1) {
+						ul.find("li.prev").addClass("disabled");
+					} else if (pageIndex == <%=totalPage%>) {
+						ul.find("li.next").addClass("disabled");
+					} else {
+						ul.find("li.disabled").removeClass("disabled");
+					}
+					var formid = "<%=configs['form']%>";
+					var form = $("#" + formid);
+					var ipageIndex = form.find("input[name='pageIndex']");
+					var ipageSize = form.find("input[name='pageSize']");
+					ipageIndex.val(pageIndex);
+					ipageSize.val(<%=configs['defaultLength']%>);
+					formSubmit();
+				});
+
+			}
+
+			function changed(select) {
+				select.bind({
+					'change' : function() {
+						var formid = "<%=configs['form']%>";
+						var form = $("#" + formid);
+						var ipageSize = form.find("input[name='pageSize']");
+						ipageSize.val(this.value);
+						formSubmit();
+					}
+				});
+			}
+			
+			function gotoChanged(select) {
+				select.bind({
+					'change' : function() {
+						var formid = "<%=configs['form']%>";
+						var form = $("#" + formid);
+						var ipageIndex = form.find("input[name='pageIndex']");
+						ipageIndex.val($(this).val());
+						formSubmit();
+					}
+				});
+			}
+			
+			function setPage(){
+				var formid = "<%=configs['form']%>";
+			    var form = $("#" + formid);
+				var ipageIndex = form.find("input[name='pageIndex']");
+			    var ipageSize = form.find("input[name='pageSize']");
+				if (!ipageIndex || !ipageIndex.attr('name')) {
+					ipageIndex = $("<input />");
+					ipageIndex.attr("name", "pageIndex").attr("type", "hidden");
+					form.append(ipageIndex);
+				}
+				if (!ipageSize || !ipageSize.attr("name")) {
+					ipageSize = $("<input />");
+					ipageSize.attr("name", "pageSize").attr("type", "hidden");
+					form.append(ipageSize);
+				}
+				ipageIndex.val(<%=currPage%>);
+				ipageSize.val(<%=pageSize%>);
+			}
+
+			function formSubmit() {
+				$("#modal-backdrop").show();//打开遮挡层
+				var sync = <%=sync%>;
+				if (sync) {
+					var formid = "<%=configs['form']%>";
+					$("#" + formid).submit();
+				} else {
+					var fn = <%=configs['method']%>;
+					var par = "<%=configs.methodParameter%>";
+					var parameter=par.split(",");
+					if(Object.prototype.toString.call(fn) === '[object Function]'){
+						if(parameter.length>0){
+							fn(parameter);
+						}else{
+							fn();
+						}
+					}
+				}
+			}
+
+			function bind() {
+				setPage();
+				var id = "<%=configs['displayContainer']%>";
+				var div = $("#" + id);
+				var ul = div.find("div.pageNumber").find("ul");
+				var lis = $('li', ul);
+				var go = div.find("div.pageNumber").find("select.go");
+				var goto = div.find("div.pageNumber").find("select.goto");
+				for ( var i = 0; i < lis.length; i++) {
+					var li = $(lis[i]);
+					if (li.hasClass('prev')) {
+						prev(li);
+					} else if (li.hasClass('next')) {
+						next(li);
+					} else {
+						number(li);
+					}
+				}
+				changed(go);
+				gotoChanged(goto);
+			}
+			bind();
+		})();
+	</script>
+</div>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wireless.web.dao.userManager.GroupDao">
+	<select id="queryForCount" parameterType="map" resultType="java.lang.Integer">
+		select count(1)
+  			from (<include refid="queryPage"/> ) b
+	</select>
+
+	<select id="queryForList" parameterType="map" resultType="map">
+		<include refid="queryPage"/>
+		limit #{lbound},#{pageSize}
+	</select>
+	<sql id="queryPage">
+		select r.* from t_role r where r.isActive = 1 ORDER BY roleid asc
+	</sql>
+	<select id="checkGroupName" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(1) from t_role where isActive = 1 and rolename = #{groupName,jdbcType=VARCHAR}
+	</select>
+	<insert id="saveGroup" parameterType="map">
+		INSERT INTO t_role (rolename,isActive,modify_date,create_date) VALUES (#{rolename}, #{isActive}, #{modifyDate}, #{createDate})
+	</insert>
+	<insert id="saveHomeMenu" parameterType="map">
+	INSERT INTO t_role_right (roleid, rightid)
+			VALUES((select r.roleid from t_role r where r.rolename = #{rolename} limit 0,1),1)
+	</insert>
+	<update id="deleteGroup" parameterType="map">
+		update t_role set isActive = #{isActive,jdbcType=DECIMAL},modify_date = #{modifyDate,jdbcType=VARCHAR}
+   			where roleid = #{roleid,jdbcType=DECIMAL}
+	</update>
+	
+	<select id="queryGroups" resultType="map">
+		select r.* from t_right r where r.rightid &lt;&gt; 1 ORDER BY r.parentid asc,r.orderby
+	</select>
+	
+	<select id="queryMyGroups" parameterType="map" resultType="map">
+		SELECT
+			g.rightid
+		FROM
+			t_role r,
+			t_role_right g
+		WHERE
+			r.roleid = #{roleid}
+		AND g.roleid = r.roleid
+	</select>
+	
+	<select id="hasUser" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT
+			count(1)
+		FROM
+			t_user u,
+			(
+				SELECT
+					ur.userid
+				FROM
+					t_role r,
+					t_user_role ur
+				WHERE
+					r.roleid = #{roleid}
+				AND r.roleid = ur.roleid
+			) ur
+		WHERE
+			u.userid = ur.userid
+		AND u.isActive = 1
+	</select>
+	
+	<delete id="deleteRoleRight" parameterType="java.lang.String">
+		DELETE FROM t_role_right WHERE roleid = #{roleid}
+	</delete>
+	<insert id="insertByBatch" parameterType="map">
+		insert into t_role_right(roleid,rightid) values(#{roleid},#{rightid})
+	</insert>
+</mapper>

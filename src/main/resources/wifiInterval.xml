@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 宽带区间值 -->
+<sys>
+<green>10</green>
+<yellow>2</yellow>
+<red>0</red>
+</sys>
